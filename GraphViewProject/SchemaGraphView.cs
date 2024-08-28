@@ -1,6 +1,8 @@
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Collections.Generic;
+
 
 namespace GV
 {
@@ -10,55 +12,100 @@ namespace GV
         {
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
 
-            // Add background grid
             var grid = new GridBackground();
             Insert(0, grid);
             grid.StretchToParentSize();
 
-            // Enable basic manipulators
+            AddManipulators();
+            AddContextualMenuOptions();
+            this.graphViewChanged += OnGraphViewChanged;
+        }
+
+        public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
+            List<Port> compatiblePorts = new List<Port>();
+            ports.ForEach(port => {
+                if (startPort == port) return;
+                if (startPort.node == port.node) return;
+                if (startPort.direction == port.direction) return;
+                if (IsCompatible(startPort, port)) compatiblePorts.Add(port);
+            });
+            return compatiblePorts;
+        }
+
+        private bool IsCompatible(Port startPort, Port targetPort)
+        {
+            var startNode = startPort.node as BaseNode;
+            var targetNode = targetPort.node as BaseNode;
+
+            // Ensure connections are between specific types
+            if (startNode is ChapterNode && targetNode is SubChapNode && startPort.direction == Direction.Output && targetPort.direction == Direction.Input)
+                return true;
+
+            if (startNode is SubChapNode)
+            {
+                if (targetNode is TextMessageNode && startPort.direction == Direction.Output && targetPort.direction == Direction.Input)
+                    return true;
+
+                if (targetNode is ResponseNode && startPort.direction == Direction.Output && targetPort.direction == Direction.Input)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void AddManipulators()
+        {
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
-
-            // Add contextual menu to create nodes
-            this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
-
-            // Add the custom edge connector listener
-            this.AddManipulator(new EdgeConnector<Edge>(new CustomEdgeConnectorListener()));
         }
 
-        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        private void AddContextualMenuOptions()
         {
-            evt.menu.AppendAction("Add SubChap Node", action => AddNode("SubChap", evt.mousePosition));
-            evt.menu.AppendAction("Add TextMessage Node", action => AddNode("TextMessage", evt.mousePosition));
-            evt.menu.AppendAction("Add Response Node", action => AddNode("Response", evt.mousePosition));
-            evt.menu.AppendAction("Add Chapter Node", action => AddNode("Chapter", evt.mousePosition));
+            this.AddManipulator(new ContextualMenuManipulator(evt => {
+                evt.menu.AppendAction("Add Chapter Node", action => AddNode(new ChapterNode(this), evt.mousePosition));
+                evt.menu.AppendAction("Add SubChap Node", action => AddNode(new SubChapNode(this), evt.mousePosition));
+                evt.menu.AppendAction("Add TextMessage Node", action => AddNode(new TextMessageNode(this), evt.mousePosition));
+                evt.menu.AppendAction("Add Response Node", action => AddNode(new ResponseNode(this), evt.mousePosition));
+            }));
         }
 
-        private void AddNode(string type, Vector2 position)
+        private void AddNode(BaseNode node, Vector2 position)
         {
-            BaseNode node = null;
-            switch (type)
+            node.SetPosition(new Rect(position, new Vector2(200, 150)));
+            AddElement(node);
+        }
+
+        private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
+        {
+            if (graphViewChange.edgesToCreate != null)
             {
-                case "SubChap":
-                    node = new SubChapNode(this);
-                    break;
-                case "TextMessage":
-                    node = new TextMessageNode(this);
-                    break;
-                case "Response":
-                    node = new ResponseNode(this);
-                    break;
-                case "Chapter":
-                    node = new ChapterNode(this);
-                    break;
+                foreach (var edge in graphViewChange.edgesToCreate)
+                {
+                    var outputNode = edge.output.node as BaseNode;
+                    var inputNode = edge.input.node as BaseNode;
+
+                    outputNode?.OnConnected(edge.output, edge);
+                    inputNode?.OnConnected(edge.input, edge);
+                }
             }
 
-            if (node != null)
+            if (graphViewChange.elementsToRemove != null)
             {
-                node.SetPosition(new Rect(position, new Vector2(200, 150)));
-                AddElement(node);
+                foreach (var element in graphViewChange.elementsToRemove)
+                {
+                    if (element is Edge edge)
+                    {
+                        var outputNode = edge.output.node as BaseNode;
+                        var inputNode = edge.input.node as BaseNode;
+
+                        outputNode?.OnDisconnected(edge.output, edge);
+                        inputNode?.OnDisconnected(edge.input, edge);
+                    }
+                }
             }
+
+            return graphViewChange;
         }
     }
 }

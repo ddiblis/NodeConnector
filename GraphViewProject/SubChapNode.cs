@@ -1,31 +1,89 @@
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using UnityEngine;
+using System.Linq;
+using System.Text;
+using System;
 
 namespace GV
 {
     public class SubChapNode : BaseNode
-    {
+    {  
+        public string Contact;
+        public string TimeIndicator;
+        public string UnlockInstaPostsAccount;
+        public List<int> UnlockPosts;
+        public List<TextMessageNode> TextList = new List<TextMessageNode>();
+        public List<ResponseNode> Responses = new List<ResponseNode>();
+
         public SubChapNode(GraphView graphView) : base(graphView)
         {
-            title = "SubChap";
+            title = "SubChapter";
 
-            // Create an output port for TextMessages
-            var outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
-            outputPort.portName = "Text Messages";
-            outputPort.AddManipulator(new EdgeConnector<Edge>(new CustomEdgeConnectorListener()));
-            outputContainer.Add(outputPort);
+            // Create input ports for Chapter and output ports for TextMessages and Responses
+            var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(ChapterNode));
+            inputPort.portName = "Parent Chapter";
+            inputContainer.Add(inputPort);
 
-            // Add other fields here...
-            var contactField = new TextField("Contact");
-            var timeIndicatorField = new TextField("TimeIndicator");
-            var unlockInstaPostsAccountField = new TextField("UnlockInstaPostsAccount");
+            var textMessageOutputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
+            textMessageOutputPort.portName = "Text Messages";
+            outputContainer.Add(textMessageOutputPort);
 
-            mainContainer.Add(contactField);
-            mainContainer.Add(timeIndicatorField);
-            mainContainer.Add(unlockInstaPostsAccountField);
+            var responseOutputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(ResponseNode));
+            responseOutputPort.portName = "Responses";
+            outputContainer.Add(responseOutputPort);
+
+            // Other fields...
+
+            VisualElement CustomDataContainer = new VisualElement();
+
+            Foldout Foldout = new Foldout(){
+                text = "Sub Chapter Content"
+            };
+
+            TextField ContactTextField = new TextField() {
+                value = Contact,
+                label = "Contact"
+            };
+
+            TextField TimeIndicatorTextField = new TextField() {
+                value = TimeIndicator,
+                label = "Time Indicator"
+            };
+
+            TextField UnlockInstaPostsAccountTextField = new TextField() {
+                value = UnlockInstaPostsAccount,
+                label = "Unlock InstaPosts Account"
+            };
+
+            TextField UnlockListTextField = new TextField() {
+                label = "Unlock Posts List"
+            };
+
+            // UnlockListTextField.RegisterValueChangedCallback(evt => UnlockPosts = int.Parse(Regex.Match(evt.newValue, @"\d+").Value));
+            UnlockListTextField.RegisterValueChangedCallback(evt => {
+                var UnlockList = (from Match m in Regex.Matches(evt.newValue, @"\d+") select m.Value).ToList();
+                GetUnlockPostList(UnlockList);
+            });
+
+            Foldout.Add(ContactTextField);
+            Foldout.Add(TimeIndicatorTextField);
+            Foldout.Add(UnlockInstaPostsAccountTextField);
+            Foldout.Add(UnlockListTextField);
+            CustomDataContainer.Add(Foldout);
+            extensionContainer.Add(CustomDataContainer);
 
             RefreshExpandedState();
             RefreshPorts();
+        }
+
+        private void GetUnlockPostList(List<string> UnlockList) {
+            UnlockPosts = new List<int>();
+            foreach(string post in UnlockList) {
+                UnlockPosts.Add(Convert.ToInt32(post));
+            }
         }
 
         public override BaseNode InstantiateNodeCopy()
@@ -34,7 +92,6 @@ namespace GV
         }
     }
 }
-
 
 
 
