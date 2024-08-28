@@ -7,10 +7,8 @@ using System.Linq;
 using System.Text;
 using System;
 
-namespace GV
-{
-    public class SubChapNode : BaseNode
-    {  
+namespace JSONMapper {
+    public class SubChapNode : BaseNode {  
         public string Contact;
         public string TimeIndicator;
         public string UnlockInstaPostsAccount;
@@ -18,8 +16,7 @@ namespace GV
         public List<TextMessageNode> TextList = new List<TextMessageNode>();
         public List<ResponseNode> Responses = new List<ResponseNode>();
 
-        public SubChapNode(GraphView graphView) : base(graphView)
-        {
+        public SubChapNode(GraphView graphView) : base(graphView) {
             title = "SubChapter";
 
             var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(ChapterNode));
@@ -70,10 +67,8 @@ namespace GV
             }
         }
 
-        public SubChap ToSubChapData()
-        {
-            return new SubChap
-            {
+        public SubChap ToSubChapData() {
+            return new SubChap {
                 Contact = this.Contact,
                 TimeIndicator = this.TimeIndicator,
                 UnlockInstaPostsAccount = this.UnlockInstaPostsAccount,
@@ -83,9 +78,7 @@ namespace GV
             };
         }
 
-
-        public override BaseNode InstantiateNodeCopy()
-        {
+        public override BaseNode InstantiateNodeCopy() {
             return new SubChapNode(graphView);
         }
     }

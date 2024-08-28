@@ -3,16 +3,13 @@ using System.Text.RegularExpressions;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
-namespace GV
-{
-    public class ResponseNode : BaseNode
-    {
+namespace JSONMapper {
+    public class ResponseNode : BaseNode {
         public bool RespTree = false;
         public string TextContent;
         public int SubChapNum;
         public int Type;
-        public ResponseNode(GraphView graphView) : base(graphView)
-        {
+        public ResponseNode(GraphView graphView) : base(graphView) {
             title = "Response";
 
             var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
@@ -46,10 +43,8 @@ namespace GV
             RefreshPorts();
         }
 
-        public Response ToResponseData()
-        {
-            return new Response
-            {
+        public Response ToResponseData() {
+            return new Response {
                 RespTree = this.RespTree,
                 TextContent = this.TextContent,
                 SubChapNum = this.SubChapNum,
@@ -57,9 +52,7 @@ namespace GV
             };
         }
 
-
-        public override BaseNode InstantiateNodeCopy()
-        {
+        public override BaseNode InstantiateNodeCopy() {
             return new ResponseNode(graphView);
         }
     }

@@ -3,15 +3,12 @@ using System.Text.RegularExpressions;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
-namespace GV
-{
-    public class TextMessageNode : BaseNode
-    {
+namespace JSONMapper {
+    public class TextMessageNode : BaseNode {
         public int Type;
         public string TextContent;
         public float TextDelay;
-        public TextMessageNode(GraphView graphView) : base(graphView)
-        {
+        public TextMessageNode(GraphView graphView) : base(graphView) {
             title = "TextMessage";
 
             var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
@@ -42,19 +39,15 @@ namespace GV
             RefreshPorts();
         }
 
-        public TextMessage ToTextMessageData()
-        {
-            return new TextMessage
-            {
+        public TextMessage ToTextMessageData() {
+            return new TextMessage {
                 Type = this.Type,
                 TextContent = this.TextContent,
                 TextDelay = this.TextDelay
             };
         }
 
-
-        public override BaseNode InstantiateNodeCopy()
-        {
+        public override BaseNode InstantiateNodeCopy() {
             return new TextMessageNode(graphView);
         }
     }

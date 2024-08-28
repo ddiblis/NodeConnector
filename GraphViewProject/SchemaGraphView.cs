@@ -4,12 +4,9 @@ using UnityEngine.UIElements;
 using System.Collections.Generic;
 
 
-namespace GV
-{
-    public class SchemaGraphView : GraphView
-    {
-        public SchemaGraphView()
-        {
+namespace JSONMapper {
+    public class SchemaGraphView : GraphView {
+        public SchemaGraphView() {
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
 
             var grid = new GridBackground();
@@ -32,8 +29,7 @@ namespace GV
             return compatiblePorts;
         }
 
-        private bool IsCompatible(Port startPort, Port targetPort)
-        {
+        private bool IsCompatible(Port startPort, Port targetPort) {
             var startNode = startPort.node as BaseNode;
             var targetNode = targetPort.node as BaseNode;
 
@@ -53,15 +49,13 @@ namespace GV
             return false;
         }
 
-        private void AddManipulators()
-        {
+        private void AddManipulators() {
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
         }
 
-        private void AddContextualMenuOptions()
-        {
+        private void AddContextualMenuOptions() {
             this.AddManipulator(new ContextualMenuManipulator(evt => {
                 evt.menu.AppendAction("Add Chapter Node", action => AddNode(new ChapterNode(this), evt.mousePosition));
                 evt.menu.AppendAction("Add SubChap Node", action => AddNode(new SubChapNode(this), evt.mousePosition));
@@ -70,18 +64,14 @@ namespace GV
             }));
         }
 
-        private void AddNode(BaseNode node, Vector2 position)
-        {
+        private void AddNode(BaseNode node, Vector2 position) {
             node.SetPosition(new Rect(position, new Vector2(200, 150)));
             AddElement(node);
         }
 
-        private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
-        {
-            if (graphViewChange.edgesToCreate != null)
-            {
-                foreach (var edge in graphViewChange.edgesToCreate)
-                {
+        private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange) {
+            if (graphViewChange.edgesToCreate != null) {
+                foreach (var edge in graphViewChange.edgesToCreate) {
                     var outputNode = edge.output.node as BaseNode;
                     var inputNode = edge.input.node as BaseNode;
 
@@ -90,12 +80,9 @@ namespace GV
                 }
             }
 
-            if (graphViewChange.elementsToRemove != null)
-            {
-                foreach (var element in graphViewChange.elementsToRemove)
-                {
-                    if (element is Edge edge)
-                    {
+            if (graphViewChange.elementsToRemove != null) {
+                foreach (var element in graphViewChange.elementsToRemove) {
+                    if (element is Edge edge) {
                         var outputNode = edge.output.node as BaseNode;
                         var inputNode = edge.input.node as BaseNode;
 

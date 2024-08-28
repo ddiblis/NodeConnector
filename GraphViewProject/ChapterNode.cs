@@ -2,15 +2,12 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 
-namespace GV
-{
-    public class ChapterNode : BaseNode
-    {
+namespace JSONMapper {
+    public class ChapterNode : BaseNode {
         public bool allowMidrolls = false;
         public List<SubChapNode> SubChaps = new List<SubChapNode>();
 
-        public ChapterNode(GraphView graphView) : base(graphView)
-        {
+        public ChapterNode(GraphView graphView) : base(graphView) {
             title = "Chapter";
 
             var outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(SubChapNode));
@@ -31,18 +28,14 @@ namespace GV
             RefreshPorts();
         }
 
-        public Chapter ToChapterData()
-        {
-            return new Chapter
-            {
+        public Chapter ToChapterData() {
+            return new Chapter {
                 AllowMidrolls = this.allowMidrolls,
                 SubChaps = this.SubChaps.ConvertAll(subChapNode => subChapNode.ToSubChapData())
             };
         }
 
-
-        public override BaseNode InstantiateNodeCopy()
-        {
+        public override BaseNode InstantiateNodeCopy() {
             return new ChapterNode(graphView);
         }
     }
