@@ -13,22 +13,15 @@ namespace GV
         {
             title = "Chapter";
 
-            // Create an input port for SubChaps
             var outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(SubChapNode));
             outputPort.portName = "SubChapters";
             inputContainer.Add(outputPort);
 
-            // Other fields...
-            VisualElement CustomDataContainer = new VisualElement();
+            var CustomDataContainer = new VisualElement();
+            var Foldout = new Foldout() { text = "Chapter Content" };
 
-            Foldout Foldout = new Foldout(){
-                text = "Chapter Content"
-            };
-
-            Toggle allowMidrollsToggle = new Toggle() {
-                value = allowMidrolls,
-                label = "Allow Midrolls"
-            };
+            var allowMidrollsToggle = new Toggle("Allow Midrolls") { value = allowMidrolls };
+            allowMidrollsToggle.RegisterValueChangedCallback(evt => allowMidrolls = evt.newValue);
 
             Foldout.Add(allowMidrollsToggle);
             CustomDataContainer.Add(Foldout);
@@ -37,6 +30,16 @@ namespace GV
             RefreshExpandedState();
             RefreshPorts();
         }
+
+        public Chapter ToChapterData()
+        {
+            return new Chapter
+            {
+                AllowMidrolls = this.allowMidrolls,
+                SubChaps = this.SubChaps.ConvertAll(subChapNode => subChapNode.ToSubChapData())
+            };
+        }
+
 
         public override BaseNode InstantiateNodeCopy()
         {

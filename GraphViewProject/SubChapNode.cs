@@ -22,7 +22,6 @@ namespace GV
         {
             title = "SubChapter";
 
-            // Create input ports for Chapter and output ports for TextMessages and Responses
             var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(ChapterNode));
             inputPort.portName = "Parent Chapter";
             inputContainer.Add(inputPort);
@@ -35,37 +34,22 @@ namespace GV
             responseOutputPort.portName = "Responses";
             outputContainer.Add(responseOutputPort);
 
-            // Other fields...
+            var CustomDataContainer = new VisualElement();
+            var Foldout = new Foldout() { text = "Sub Chapter Content" };
 
-            VisualElement CustomDataContainer = new VisualElement();
+            var ContactTextField = new TextField("Contact") { value = Contact };
+            ContactTextField.RegisterValueChangedCallback(evt => Contact = evt.newValue);
 
-            Foldout Foldout = new Foldout(){
-                text = "Sub Chapter Content"
-            };
+            var TimeIndicatorTextField = new TextField("Time Indicator") { value = TimeIndicator };
+            TimeIndicatorTextField.RegisterValueChangedCallback(evt => TimeIndicator = evt.newValue);
 
-            TextField ContactTextField = new TextField() {
-                value = Contact,
-                label = "Contact"
-            };
+            var UnlockInstaPostsAccountTextField = new TextField("Unlock InstaPosts Account") { value = UnlockInstaPostsAccount };
+            UnlockInstaPostsAccountTextField.RegisterValueChangedCallback(evt => UnlockInstaPostsAccount = evt.newValue);
 
-            TextField TimeIndicatorTextField = new TextField() {
-                value = TimeIndicator,
-                label = "Time Indicator"
-            };
-
-            TextField UnlockInstaPostsAccountTextField = new TextField() {
-                value = UnlockInstaPostsAccount,
-                label = "Unlock InstaPosts Account"
-            };
-
-            TextField UnlockListTextField = new TextField() {
-                label = "Unlock Posts List"
-            };
-
-            // UnlockListTextField.RegisterValueChangedCallback(evt => UnlockPosts = int.Parse(Regex.Match(evt.newValue, @"\d+").Value));
+            var UnlockListTextField = new TextField("Unlock Posts List");
             UnlockListTextField.RegisterValueChangedCallback(evt => {
                 var UnlockList = (from Match m in Regex.Matches(evt.newValue, @"\d+") select m.Value).ToList();
-                GetUnlockPostList(UnlockList);
+                UnlockPosts = UnlockList.ConvertAll(int.Parse);
             });
 
             Foldout.Add(ContactTextField);
@@ -86,12 +70,23 @@ namespace GV
             }
         }
 
+        public SubChap ToSubChapData()
+        {
+            return new SubChap
+            {
+                Contact = this.Contact,
+                TimeIndicator = this.TimeIndicator,
+                UnlockInstaPostsAccount = this.UnlockInstaPostsAccount,
+                UnlockPosts = this.UnlockPosts,
+                TextList = this.TextList.ConvertAll(textNode => textNode.ToTextMessageData()),
+                Responses = this.Responses.ConvertAll(responseNode => responseNode.ToResponseData())
+            };
+        }
+
+
         public override BaseNode InstantiateNodeCopy()
         {
             return new SubChapNode(graphView);
         }
     }
 }
-
-
-

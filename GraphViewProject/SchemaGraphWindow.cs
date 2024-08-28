@@ -1,15 +1,19 @@
 using UnityEditor;
-using UnityEngine;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
+using UnityEngine.UIElements;
+using System.IO;
+using System.Collections.Generic;
+using UnityEditor.UIElements;
 
 namespace GV
 {
     public class SchemaGraphWindow : EditorWindow
     {
-        private SchemaGraphView _graphView;
+        private SchemaGraphView graphView;
 
         [MenuItem("Window/Schema Graph")]
-        public static void OpenSchemaGraphWindow()
+        public static void Open()
         {
             var window = GetWindow<SchemaGraphWindow>();
             window.titleContent = new GUIContent("Schema Graph");
@@ -17,20 +21,52 @@ namespace GV
 
         private void OnEnable()
         {
-            // Initialize the graph view and add it to the root element.
-            _graphView = new SchemaGraphView
+            ConstructGraphView();
+            GenerateToolbar();
+        }
+
+        private void ConstructGraphView()
+        {
+            graphView = new SchemaGraphView
             {
                 name = "Schema Graph"
             };
-
-            // Set the graph view to fill the entire window.
-            _graphView.style.flexGrow = 1.0f;
-            rootVisualElement.Add(_graphView);
+            graphView.StretchToParentSize();
+            rootVisualElement.Add(graphView);
         }
 
-        private void OnDisable()
+        private void GenerateToolbar()
         {
-            rootVisualElement.Remove(_graphView);
+            var toolbar = new Toolbar();
+
+            var saveButton = new Button(() => SaveGraphToJson())
+            {
+                text = "Save"
+            };
+            toolbar.Add(saveButton);
+
+            rootVisualElement.Add(toolbar);
+        }
+
+        private void SaveGraphToJson()
+        {
+            Chapter Chapter = new Chapter();
+
+            foreach (var node in graphView.nodes)
+            {
+                if (node is ChapterNode chapterNode)
+                {
+                    Chapter = chapterNode.ToChapterData();
+                }
+            }
+
+            string json = JsonUtility.ToJson(Chapter, true);
+            string path = EditorUtility.SaveFilePanel("Save Graph", "", "GraphData.json", "json");
+            if (!string.IsNullOrEmpty(path))
+            {
+                File.WriteAllText(path, json);
+                Debug.Log("Graph saved to " + path);
+            }
         }
     }
 }

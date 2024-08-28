@@ -15,40 +15,25 @@ namespace GV
         {
             title = "Response";
 
-            // Create an input port for SubChap
             var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
             inputPort.portName = "Parent SubChap";
             inputContainer.Add(inputPort);
 
-            // Other fields...
-            VisualElement CustomDataContainer = new VisualElement();
+            var CustomDataContainer = new VisualElement();
+            var Foldout = new Foldout() { text = "Response Content" };
 
-            Foldout Foldout = new Foldout(){
-                text = "Response Content"
-            };
-
-            TextField TextMessageField = new TextField() {
-                label = "Response Text",
-                value = TextContent
-            };
-
-            List<string> TypeOptions = new List<string>{
-                "Type of Text", "Sent Text 0", "Sent Image 2", "Sent Emoji 4"
-            };
-            DropdownField TypeDropDown = new DropdownField("Type Of Text", TypeOptions, 0) {
-                label = "Text Type"
-            };
+            var TextMessageField = new TextField("Response Text", 256, false, false, 'a') { value = TextContent };
+            TextMessageField.RegisterValueChangedCallback(evt => TextContent = evt.newValue);
             
+            var TypeOptions = new List<string>{ "Type of Text", "Sent Text 0", "Sent Image 2", "Sent Emoji 4" };
+            var TypeDropDown = new DropdownField("Text Type", TypeOptions, 0);
             TypeDropDown.RegisterValueChangedCallback(evt => Type = int.Parse(Regex.Match(evt.newValue, @"\d+").Value));
 
-            IntegerField NextSubChapField = new IntegerField(){
-                label = "Next Sub Chapter (int)"
-            };
+            var NextSubChapField = new IntegerField("Next Sub Chapter") { value = SubChapNum };
+            NextSubChapField.RegisterValueChangedCallback(evt => SubChapNum = evt.newValue);
 
-            Toggle ResponseTreeToggle = new Toggle() {
-                value = RespTree,
-                label = "Response Tree"
-            };
+            var ResponseTreeToggle = new Toggle("Response Tree") { value = RespTree };
+            ResponseTreeToggle.RegisterValueChangedCallback(evt => RespTree = evt.newValue);
 
             Foldout.Add(ResponseTreeToggle);
             Foldout.Add(TextMessageField);
@@ -60,6 +45,18 @@ namespace GV
             RefreshExpandedState();
             RefreshPorts();
         }
+
+        public Response ToResponseData()
+        {
+            return new Response
+            {
+                RespTree = this.RespTree,
+                TextContent = this.TextContent,
+                SubChapNum = this.SubChapNum,
+                Type = this.Type
+            };
+        }
+
 
         public override BaseNode InstantiateNodeCopy()
         {
