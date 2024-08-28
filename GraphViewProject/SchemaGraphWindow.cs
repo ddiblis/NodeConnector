@@ -21,6 +21,14 @@ namespace JSONMapper {
         private void OnEnable() {
             ConstructGraphView();
             GenerateToolbar();
+            AddStyles();
+        }
+
+        private void AddStyles()
+        {
+            rootVisualElement.AddStyleSheets(
+                "JSONMapperStyles/JMVariables.uss"
+            );
         }
 
         private void ConstructGraphView() {
@@ -127,11 +135,6 @@ namespace JSONMapper {
             }
         }
 
-
-        private SubChapNode FindSubChapNodeByContact(string contact) {
-            return graphView.nodes.OfType<SubChapNode>().FirstOrDefault(node => node.Contact == contact);
-        }
-
         private TextMessageNode CreateTextMessageNode(TextMessage data) {
             var textMessageNode = new TextMessageNode(graphView) {
                 Type = data.Type,
@@ -156,8 +159,6 @@ namespace JSONMapper {
         private void ReconnectNodes() {
             // You may need to implement logic to reconnect nodes based on the data structure and how you saved connections.
         }
-
-
 
         private void SaveGraphToJson() {
             Chapter Chapter = new Chapter();

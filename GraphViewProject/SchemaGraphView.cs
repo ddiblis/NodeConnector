@@ -15,7 +15,16 @@ namespace JSONMapper {
 
             AddManipulators();
             AddContextualMenuOptions();
+            AddStyles();
             this.graphViewChanged += OnGraphViewChanged;
+        }
+
+        private void AddStyles()
+        {
+            this.AddStyleSheets(
+                "JSONMapperStyles/JMGraphViewStyles.uss",
+                "JSONMapperStyles/JMNodeStyles.uss"
+            );
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
@@ -57,10 +66,10 @@ namespace JSONMapper {
 
         private void AddContextualMenuOptions() {
             this.AddManipulator(new ContextualMenuManipulator(evt => {
-                evt.menu.AppendAction("Add Chapter Node", action => AddNode(new ChapterNode(this), evt.mousePosition));
-                evt.menu.AppendAction("Add SubChap Node", action => AddNode(new SubChapNode(this), evt.mousePosition));
-                evt.menu.AppendAction("Add TextMessage Node", action => AddNode(new TextMessageNode(this), evt.mousePosition));
-                evt.menu.AppendAction("Add Response Node", action => AddNode(new ResponseNode(this), evt.mousePosition));
+                evt.menu.AppendAction("Add Chapter Node", action => AddNode(new ChapterNode(this), GetLocalMousePosition(action.eventInfo.localMousePosition)));
+                evt.menu.AppendAction("Add SubChap Node", action => AddNode(new SubChapNode(this), GetLocalMousePosition(action.eventInfo.localMousePosition)));
+                evt.menu.AppendAction("Add TextMessage Node", action => AddNode(new TextMessageNode(this), GetLocalMousePosition(action.eventInfo.localMousePosition)));
+                evt.menu.AppendAction("Add Response Node", action => AddNode(new ResponseNode(this), GetLocalMousePosition(action.eventInfo.localMousePosition)));
             }));
         }
 
@@ -93,6 +102,11 @@ namespace JSONMapper {
             }
 
             return graphViewChange;
+        }
+        public Vector2 GetLocalMousePosition(Vector2 mousePosition) {
+            Vector2 worldMousePosition = mousePosition;
+            Vector2 localMousePosition = contentViewContainer.WorldToLocal(worldMousePosition);
+            return localMousePosition;
         }
     }
 }

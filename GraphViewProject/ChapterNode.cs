@@ -15,10 +15,17 @@ namespace JSONMapper {
             inputContainer.Add(outputPort);
 
             var CustomDataContainer = new VisualElement();
+            CustomDataContainer.AddToClassList("jm-node__custom-data-container");
+
             var Foldout = new Foldout() { text = "Chapter Content" };
 
             var allowMidrollsToggle = new Toggle("Allow Midrolls") { value = allowMidrolls };
             allowMidrollsToggle.RegisterValueChangedCallback(evt => allowMidrolls = evt.newValue);
+
+            allowMidrollsToggle.AddClasses(
+                "jm-node__textfield",
+                "jm-node__quote-textfield"
+            );
 
             Foldout.Add(allowMidrollsToggle);
             CustomDataContainer.Add(Foldout);

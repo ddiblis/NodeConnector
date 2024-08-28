@@ -17,6 +17,8 @@ namespace JSONMapper {
             inputContainer.Add(inputPort);
 
             var CustomDataContainer = new VisualElement();
+            CustomDataContainer.AddToClassList("jm-node__custom-data-container");
+
             var Foldout = new Foldout() { text = "Response Content" };
 
             var TextMessageField = new TextField("Response Text", 256, false, false, 'a') { value = TextContent };
@@ -31,6 +33,23 @@ namespace JSONMapper {
 
             var ResponseTreeToggle = new Toggle("Response Tree") { value = RespTree };
             ResponseTreeToggle.RegisterValueChangedCallback(evt => RespTree = evt.newValue);
+
+            TextMessageField.AddClasses(
+                "jm-node__textfield",
+                "jm-node__quote-textfield"
+            );
+            ResponseTreeToggle.AddClasses(
+                "jm-node__textfield",
+                "jm-node__quote-textfield"
+            );
+            TypeDropDown.AddClasses(
+                "jm-node__textfield",
+                "jm-node__quote-textfield"
+            );
+            NextSubChapField.AddClasses(
+                "jm-node__textfield",
+                "jm-node__quote-textfield"
+            );
 
             Foldout.Add(ResponseTreeToggle);
             Foldout.Add(TextMessageField);

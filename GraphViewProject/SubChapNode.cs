@@ -32,6 +32,8 @@ namespace JSONMapper {
             outputContainer.Add(responseOutputPort);
 
             var CustomDataContainer = new VisualElement();
+            CustomDataContainer.AddToClassList("jm-node__custom-data-container");
+
             var Foldout = new Foldout() { text = "Sub Chapter Content" };
 
             var ContactTextField = new TextField("Contact") { value = Contact };
@@ -40,7 +42,7 @@ namespace JSONMapper {
             var TimeIndicatorTextField = new TextField("Time Indicator") { value = TimeIndicator };
             TimeIndicatorTextField.RegisterValueChangedCallback(evt => TimeIndicator = evt.newValue);
 
-            var UnlockInstaPostsAccountTextField = new TextField("Unlock InstaPosts Account") { value = UnlockInstaPostsAccount };
+            var UnlockInstaPostsAccountTextField = new TextField("Unlock Insta Account") { value = UnlockInstaPostsAccount };
             UnlockInstaPostsAccountTextField.RegisterValueChangedCallback(evt => UnlockInstaPostsAccount = evt.newValue);
 
             var UnlockListTextField = new TextField("Unlock Posts List");
@@ -48,6 +50,24 @@ namespace JSONMapper {
                 var UnlockList = (from Match m in Regex.Matches(evt.newValue, @"\d+") select m.Value).ToList();
                 UnlockPosts = UnlockList.ConvertAll(int.Parse);
             });
+
+
+            ContactTextField.AddClasses(
+                "jm-node__subchap-textfield",
+                "jm-node__subchap-quote-textfield"
+            );
+            TimeIndicatorTextField.AddClasses(
+                "jm-node__subchap-textfield",
+                "jm-node__subchap-quote-textfield"
+            );
+            UnlockInstaPostsAccountTextField.AddClasses(
+                "jm-node__subchap-textfield",
+                "jm-node__subchap-quote-textfield"
+            );
+            UnlockListTextField.AddClasses(
+                "jm-node__subchap-textfield",
+                "jm-node__subchap-quote-textfield"
+            );
 
             Foldout.Add(ContactTextField);
             Foldout.Add(TimeIndicatorTextField);

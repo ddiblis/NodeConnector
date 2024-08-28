@@ -16,6 +16,8 @@ namespace JSONMapper {
             inputContainer.Add(inputPort);
 
             var CustomDataContainer = new VisualElement();
+            CustomDataContainer.AddToClassList("jm-node__custom-data-container");
+
             var Foldout = new Foldout() { text = "Text Message Content" };
 
             var TextMessageField = new TextField("Text message") { value = TextContent };
@@ -28,6 +30,19 @@ namespace JSONMapper {
             var DelayOptions = new List<string>{ "Delay Options", "Very Fast 0.5", "Fast 1.0", "Medium 2.0", "Slow 2.7", "Very slow 3.5", "Dramatic Pause 5.0" };
             var DelayDropDown = new DropdownField("Text Delay", DelayOptions, 0);
             DelayDropDown.RegisterValueChangedCallback(evt => TextDelay = float.Parse(Regex.Match(evt.newValue, @"\d+[.][^2]").Value));
+
+            TextMessageField.AddClasses(
+                "jm-node__textfield",
+                "jm-node__quote-textfield"
+            );
+            TypeDropDown.AddClasses(
+                "jm-node__textfield",
+                "jm-node__quote-textfield"
+            );
+            DelayDropDown.AddClasses(
+                "jm-node__textfield",
+                "jm-node__quote-textfield"
+            );
 
             Foldout.Add(TextMessageField);
             Foldout.Add(TypeDropDown);
