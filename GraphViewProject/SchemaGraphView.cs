@@ -27,6 +27,7 @@ namespace JSONMapper {
             );
         }
 
+        // it says 0 references but it is actually handling the connection, do not remove itW
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
             List<Port> compatiblePorts = new List<Port>();
             ports.ForEach(port => {
@@ -43,17 +44,51 @@ namespace JSONMapper {
             var targetNode = targetPort.node as BaseNode;
 
             // Ensure connections are between specific types
-            if (startNode is ChapterNode && targetNode is SubChapNode && startPort.direction == Direction.Output && targetPort.direction == Direction.Input)
-                return true;
+            if (
+                startNode is ChapterNode
+                && targetNode is SubChapNode
+                && startPort.direction == Direction.Output
+                && targetPort.direction == Direction.Input
+            ) return true;
 
-            if (startNode is SubChapNode)
-            {
-                if (targetNode is TextMessageNode && startPort.direction == Direction.Output && targetPort.direction == Direction.Input)
-                    return true;
+            if (
+                startNode is SubChapNode
+                && targetNode is ChapterNode
+                && startPort.direction == Direction.Input
+                && targetPort.direction == Direction.Output
+            ) return true;
 
-                if (targetNode is ResponseNode && startPort.direction == Direction.Output && targetPort.direction == Direction.Input)
-                    return true;
-            }
+            if (
+                startNode is SubChapNode
+                && startPort.portName == "Text Messages"
+                && targetNode is TextMessageNode
+                && startPort.direction == Direction.Output
+                && targetPort.direction == Direction.Input
+            ) return true;
+
+            if (
+                startNode is SubChapNode
+                && startPort.portName == "Responses"
+                && targetNode is ResponseNode
+                && startPort.direction == Direction.Output
+                && targetPort.direction == Direction.Input
+            ) return true;
+
+            if (
+                startNode is TextMessageNode
+                && targetNode is SubChapNode
+                && startPort.direction == Direction.Input
+                && targetPort.direction == Direction.Output
+                && targetPort.portName == "Text Messages"
+            ) return true;
+
+            if (
+                startNode is ResponseNode
+                && targetNode is SubChapNode
+                && startPort.direction == Direction.Input
+                && targetPort.direction == Direction.Output
+                && targetPort.portName == "Responses"
+            ) return true;
 
             return false;
         }
