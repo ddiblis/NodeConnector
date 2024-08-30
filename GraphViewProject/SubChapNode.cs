@@ -21,6 +21,8 @@ namespace JSONMapper {
         private TextField UnlockInstaPostsAccountTextField;
         private TextField UnlockListTextField;
         public Port ParentChapterPort;
+        public Port TextMessagesPort;
+        public Port ResponsesPort;
 
 
         public SubChapNode(GraphView graphView) : base(graphView) {
@@ -30,13 +32,13 @@ namespace JSONMapper {
             ParentChapterPort.portName = "Parent Chapter";
             inputContainer.Add(ParentChapterPort);
 
-            var textMessageOutputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
-            textMessageOutputPort.portName = "Text Messages";
-            outputContainer.Add(textMessageOutputPort);
+            TextMessagesPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
+            TextMessagesPort.portName = "Text Messages";
+            outputContainer.Add(TextMessagesPort);
 
-            var responseOutputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(ResponseNode));
-            responseOutputPort.portName = "Responses";
-            outputContainer.Add(responseOutputPort);
+            ResponsesPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(ResponseNode));
+            ResponsesPort.portName = "Responses";
+            outputContainer.Add(ResponsesPort);
 
             var CustomDataContainer = new VisualElement();
             CustomDataContainer.AddToClassList("jm-node__custom-data-container");
@@ -93,12 +95,21 @@ namespace JSONMapper {
             UnlockListTextField.value = string.Join( ",", UnlockPosts.ToArray());
         }
 
-        public SubChap ToSubChapAsset() {
-            return new SubChap {
+        public SubChapData ToSubChapNodeData() {
+            Rect rect = this.GetPosition();
+            return new SubChapData {
                 Contact = this.Contact,
                 TimeIndicator = this.TimeIndicator,
                 UnlockInstaPostsAccount = this.UnlockInstaPostsAccount,
                 UnlockPosts = this.UnlockPosts,
+                TextList = this.TextList.ConvertAll(textNode => textNode.ToTextMessageNodeData()),
+                Responses = this.Responses.ConvertAll(responseNode => responseNode.ToResponseNodeData()),
+                location = new Location {
+                    x = rect.x,
+                    y = rect.y,
+                    Width = rect.width,
+                    Height = rect.height
+                }
             };
         }
 

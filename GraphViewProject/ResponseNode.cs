@@ -17,13 +17,14 @@ namespace JSONMapper {
         private Toggle ResponseTreeToggle;
         private IntegerField NextSubChapField;
         private DropdownField TypeDropDown;
+        public Port ParentSubChapPort;
 
         public ResponseNode(GraphView graphView) : base(graphView) {
             title = "Response";
 
-            var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
-            inputPort.portName = "Parent SubChap";
-            inputContainer.Add(inputPort);
+            ParentSubChapPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
+            ParentSubChapPort.portName = "Parent SubChap";
+            inputContainer.Add(ParentSubChapPort);
 
             var CustomDataContainer = new VisualElement();
             CustomDataContainer.AddToClassList("jm-node__custom-data-container");
@@ -76,6 +77,22 @@ namespace JSONMapper {
             ResponseTreeToggle.value = RespTree;
             NextSubChapField.value = SubChapNum;
             TypeDropDown.value = TypeOptions[TypeIndex >= 0 ? TypeIndex : 0];
+        }
+
+        public ResponseData ToResponseNodeData() {
+            Rect rect = this.GetPosition();
+            return new ResponseData {
+                RespTree = this.RespTree,
+                TextContent = this.TextContent,
+                SubChapNum = this.SubChapNum,
+                Type = this.Type,
+                location = new Location {
+                    x = rect.x,
+                    y = rect.y,
+                    Width = rect.width,
+                    Height = rect.height
+                }
+            };
         }
 
         public Response ToResponseData() {

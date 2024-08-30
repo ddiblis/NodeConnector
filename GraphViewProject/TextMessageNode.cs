@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace JSONMapper {
@@ -19,15 +20,16 @@ namespace JSONMapper {
         private TextField TextMessageField;
         private DropdownField TypeDropDown;
         private DropdownField DelayDropDown;
+        public Port ParentSubChapPort;
 
 
         public TextMessageNode(GraphView graphView) : base(graphView) {
 
             title = "TextMessage";
 
-            var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
-            inputPort.portName = "Parent SubChap";
-            inputContainer.Add(inputPort);
+            ParentSubChapPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
+            ParentSubChapPort.portName = "Parent SubChap";
+            inputContainer.Add(ParentSubChapPort);
 
             var CustomDataContainer = new VisualElement();
             CustomDataContainer.AddToClassList("jm-node__custom-data-container");
@@ -72,6 +74,21 @@ namespace JSONMapper {
             TextMessageField.value = TextContent;
             TypeDropDown.value = TypeOptions[TypeIndex >= 0 ? TypeIndex : 0];
             DelayDropDown.value = DelayOptions[DelayIndex >= 0 ? DelayIndex : 0];
+        }
+
+        public TextMessageData ToTextMessageNodeData() {
+            Rect rect = this.GetPosition();
+            return new TextMessageData {
+                Type = this.Type,
+                TextContent = this.TextContent,
+                TextDelay = this.TextDelay,
+                location = new Location {
+                    x = rect.x,
+                    y = rect.y,
+                    Width = rect.width,
+                    Height = rect.height
+                }
+            };
         }
 
         public TextMessage ToTextMessageData() {

@@ -1,6 +1,7 @@
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace JSONMapper {
     public class ChapterNode : BaseNode {
@@ -40,13 +41,21 @@ namespace JSONMapper {
         public void UpdateFields() {
             allowMidrollsToggle.value = allowMidrolls;
         }
-        
-        public Chapter ToChapterAsset() {
-            return new Chapter {
+
+        public ChapterData ToChapterNodeData() {
+            Rect rect = this.GetPosition();
+            return new ChapterData {
                 AllowMidrolls = this.allowMidrolls,
+                SubChaps = this.SubChaps.ConvertAll(subChapNode => subChapNode.ToSubChapNodeData()),
+                location = new Location {
+                    x = rect.x,
+                    y = rect.y,
+                    Width = rect.width,
+                    Height = rect.height
+                }
             };
         }
-
+        
         public Chapter ToChapterData() {
             return new Chapter {
                 AllowMidrolls = this.allowMidrolls,

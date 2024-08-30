@@ -14,17 +14,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Chapters:
   - AllowMidrolls: 1
+    location:
+      x: 311
+      y: 226
+      Width: 192
+      Height: 135
     SubChaps:
     - Contact: Althea
       TimeIndicator: 2 Days Later
       TextList:
       - Type: 1
-        TextContent: Testing sent text
+        TextContent: Test Text
         TextDelay: 2.5
+        location:
+          x: 961
+          y: 120
+          Width: 323
+          Height: 214
       UnlockInstaPostsAccount: Althea
       UnlockPosts: 0100000002000000030000000400000005000000
       Responses:
       - RespTree: 0
-        TextContent: Testing resp
-        SubChapNum: 5
+        TextContent: Resp
+        SubChapNum: 8
         Type: 0
+        location:
+          x: 972
+          y: 363
+          Width: 323
+          Height: 231
+      location:
+        x: 577
+        y: 249
+        Width: 323
+        Height: 289
