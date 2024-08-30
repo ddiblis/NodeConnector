@@ -15,8 +15,8 @@ MonoBehaviour:
   Chapters:
   - AllowMidrolls: 1
     location:
-      x: 311
-      y: 226
+      x: 111
+      y: 250
       Width: 192
       Height: 135
     SubChaps:
@@ -27,8 +27,8 @@ MonoBehaviour:
         TextContent: Test Text
         TextDelay: 2.5
         location:
-          x: 961
-          y: 120
+          x: 1077
+          y: -483
           Width: 323
           Height: 214
       UnlockInstaPostsAccount: Althea
@@ -39,12 +39,40 @@ MonoBehaviour:
         SubChapNum: 8
         Type: 0
         location:
-          x: 972
-          y: 363
+          x: 788
+          y: 227
           Width: 323
-          Height: 231
+          Height: 255
       location:
-        x: 577
-        y: 249
+        x: 525
+        y: -71
+        Width: 323
+        Height: 289
+    - Contact: Blonde
+      TimeIndicator: 3 Days Later
+      TextList:
+      - Type: 1
+        TextContent: test1
+        TextDelay: 0.5
+        location:
+          x: 1307
+          y: 403
+          Width: 323
+          Height: 214
+      UnlockInstaPostsAccount: Blonde
+      UnlockPosts: 06000000070000000800000009000000
+      Responses:
+      - RespTree: 1
+        TextContent: resp2
+        SubChapNum: 7
+        Type: 0
+        location:
+          x: 1299
+          y: 624
+          Width: 323
+          Height: 255
+      location:
+        x: 794
+        y: 502
         Width: 323
         Height: 289

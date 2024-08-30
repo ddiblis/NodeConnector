@@ -90,6 +90,22 @@ namespace JSONMapper {
                 && targetPort.portName == "Responses"
             ) return true;
 
+            if (
+                startNode is ResponseNode
+                && targetNode is SubChapNode
+                && startPort.direction == Direction.Output
+                && targetPort.direction == Direction.Input
+                && targetPort.portName == "Parent Response"
+            ) return true;
+
+            if (
+                startNode is SubChapNode
+                && targetNode is ResponseNode
+                && startPort.direction == Direction.Input
+                && targetPort.direction == Direction.Output
+                && targetPort.portName == "Next SubChap"
+            ) return true;
+
             return false;
         }
 

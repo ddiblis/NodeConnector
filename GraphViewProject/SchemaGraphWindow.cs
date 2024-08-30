@@ -59,6 +59,7 @@ namespace JSONMapper {
                 text = "Load From Asset"
             };
             toolbar.Add(LoadAssetButton); 
+            toolbar.AddStyleSheets("JSONMapperStyles/JMToolbarStyles.uss");
 
             rootVisualElement.Add(toolbar);
         }

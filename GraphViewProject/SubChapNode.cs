@@ -23,6 +23,7 @@ namespace JSONMapper {
         public Port ParentChapterPort;
         public Port TextMessagesPort;
         public Port ResponsesPort;
+        public Port ParentResponsePort;
 
 
         public SubChapNode(GraphView graphView) : base(graphView) {
@@ -31,6 +32,10 @@ namespace JSONMapper {
             ParentChapterPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(ChapterNode));
             ParentChapterPort.portName = "Parent Chapter";
             inputContainer.Add(ParentChapterPort);
+
+            ParentResponsePort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(ChapterNode));
+            ParentResponsePort.portName = "Parent Response";
+            inputContainer.Add(ParentResponsePort);
 
             TextMessagesPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
             TextMessagesPort.portName = "Text Messages";

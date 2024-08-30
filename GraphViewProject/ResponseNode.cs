@@ -18,6 +18,7 @@ namespace JSONMapper {
         private IntegerField NextSubChapField;
         private DropdownField TypeDropDown;
         public Port ParentSubChapPort;
+        public Port NextSubChapterNodePort;
 
         public ResponseNode(GraphView graphView) : base(graphView) {
             title = "Response";
@@ -25,6 +26,10 @@ namespace JSONMapper {
             ParentSubChapPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
             ParentSubChapPort.portName = "Parent SubChap";
             inputContainer.Add(ParentSubChapPort);
+
+            NextSubChapterNodePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(SubChapNode));
+            NextSubChapterNodePort.portName = "Next SubChap";
+            inputContainer.Add(NextSubChapterNodePort);
 
             var CustomDataContainer = new VisualElement();
             CustomDataContainer.AddToClassList("jm-node__custom-data-container");

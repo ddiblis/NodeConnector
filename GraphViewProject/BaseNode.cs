@@ -19,7 +19,6 @@ namespace JSONMapper {
             RefreshPorts();
         }
 
-        // This method is called when an edge is connected to this node
         public virtual void OnConnected(Port port, Edge edge) {
             if (port.direction == Direction.Output) {
                 if (this is SubChapNode subChapNode) {
@@ -33,10 +32,19 @@ namespace JSONMapper {
                 else if (this is ChapterNode chapterNode && port.portName == "SubChapters" && edge.input.node is SubChapNode subChap) {
                     chapterNode.SubChaps.Add(subChap);
                 }
+                else if (this is ResponseNode responseNode && port.portName == "Next SubChap" && edge.input.node is SubChapNode subChap1) {
+                    ChapterNode chapNode = null;
+                    foreach (var node in graphView.nodes) {
+                        if (node is ChapterNode chapterNode1) {
+                            chapNode = chapterNode1;
+                        }
+                    }
+                    responseNode.SubChapNum = chapNode.SubChaps.FindIndex(x => x == subChap1);
+                    responseNode.UpdateFields();
+                }
             }
         }
 
-        // This method is called when an edge is disconnected from this node
         public virtual void OnDisconnected(Port port, Edge edge) {
             if (port.direction == Direction.Output) {
                 if (this is SubChapNode subChapNode) {
