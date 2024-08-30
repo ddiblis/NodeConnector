@@ -22,7 +22,6 @@ namespace JSONMapper {
         // This method is called when an edge is connected to this node
         public virtual void OnConnected(Port port, Edge edge) {
             if (port.direction == Direction.Output) {
-                // Example for handling TextMessage connections in SubChapNode
                 if (this is SubChapNode subChapNode) {
                     if (port.portName == "Text Messages" && edge.input.node is TextMessageNode textMessageNode) {
                         subChapNode.TextList.Add(textMessageNode);
@@ -40,7 +39,6 @@ namespace JSONMapper {
         // This method is called when an edge is disconnected from this node
         public virtual void OnDisconnected(Port port, Edge edge) {
             if (port.direction == Direction.Output) {
-                // Example for handling TextMessage disconnections in SubChapNode
                 if (this is SubChapNode subChapNode) {
                     if (port.portName == "Text Messages" && edge.input.node is TextMessageNode textMessageNode) {
                         subChapNode.TextList.Remove(textMessageNode);

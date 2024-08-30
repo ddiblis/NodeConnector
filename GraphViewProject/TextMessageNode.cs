@@ -5,10 +5,24 @@ using UnityEngine.UIElements;
 
 namespace JSONMapper {
     public class TextMessageNode : BaseNode {
+        readonly List<string> TypeOptions = new() {
+            "Type of Text", "Recieved Text 1", "Recieved Image 3", "Recieved Emoji 5", "Chapter end 6"
+        };
+        readonly List<string> DelayOptions = new() {
+            "Delay Options", "Very Fast 0.5", "Fast 1.0", "Medium 2.0", "Slow 2.5", "Very slow 3.5", "Dramatic Pause 5.0"
+        };
+
         public int Type;
         public string TextContent;
         public float TextDelay;
+
+        private TextField TextMessageField;
+        private DropdownField TypeDropDown;
+        private DropdownField DelayDropDown;
+
+
         public TextMessageNode(GraphView graphView) : base(graphView) {
+
             title = "TextMessage";
 
             var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
@@ -20,15 +34,13 @@ namespace JSONMapper {
 
             var Foldout = new Foldout() { text = "Text Message Content" };
 
-            var TextMessageField = new TextField("Text message") { value = TextContent };
+            TextMessageField = new TextField("Text message") { value = TextContent };
             TextMessageField.RegisterValueChangedCallback(evt => TextContent = evt.newValue);
 
-            var TypeOptions = new List<string>{ "Type of Text", "Recieved Text 1", "Recieved Image 3", "Recieved Emoji 5", "Chapter end 6" };
-            var TypeDropDown = new DropdownField("Text Type", TypeOptions, 0);
+            TypeDropDown = new DropdownField("Text Type", TypeOptions, 0);
             TypeDropDown.RegisterValueChangedCallback(evt => Type = int.Parse(Regex.Match(evt.newValue, @"\d+").Value));
 
-            var DelayOptions = new List<string>{ "Delay Options", "Very Fast 0.5", "Fast 1.0", "Medium 2.0", "Slow 2.7", "Very slow 3.5", "Dramatic Pause 5.0" };
-            var DelayDropDown = new DropdownField("Text Delay", DelayOptions, 0);
+            DelayDropDown = new DropdownField("Text Delay", DelayOptions, 0);
             DelayDropDown.RegisterValueChangedCallback(evt => TextDelay = float.Parse(Regex.Match(evt.newValue, @"\d+[.][^2]").Value));
 
             TextMessageField.AddClasses(
@@ -52,6 +64,12 @@ namespace JSONMapper {
 
             RefreshExpandedState();
             RefreshPorts();
+        }
+
+        public void UpdateFields() {
+            TextMessageField.value = TextContent;
+            TypeDropDown.value = TypeOptions[TypeOptions.FindIndex(x => x.Contains("" + Type))];
+            DelayDropDown.value = DelayOptions[DelayOptions.FindIndex(x => x.Contains("" + TextDelay))];
         }
 
         public TextMessage ToTextMessageData() {

@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 namespace JSONMapper {
     public class ChapterNode : BaseNode {
-        public bool allowMidrolls = false;
+        public bool allowMidrolls;
+        private Toggle allowMidrollsToggle;
         public List<SubChapNode> SubChaps = new List<SubChapNode>();
 
         public ChapterNode(GraphView graphView) : base(graphView) {
@@ -19,7 +20,7 @@ namespace JSONMapper {
 
             var Foldout = new Foldout() { text = "Chapter Content" };
 
-            var allowMidrollsToggle = new Toggle("Allow Midrolls") { value = allowMidrolls };
+            allowMidrollsToggle = new Toggle("Allow Midrolls") { value = allowMidrolls };
             allowMidrollsToggle.RegisterValueChangedCallback(evt => allowMidrolls = evt.newValue);
 
             allowMidrollsToggle.AddClasses(
@@ -33,6 +34,16 @@ namespace JSONMapper {
 
             RefreshExpandedState();
             RefreshPorts();
+        }
+
+        public void UpdateFields() {
+            allowMidrollsToggle.value = allowMidrolls;
+        }
+        
+        public Chapter ToChapterAsset() {
+            return new Chapter {
+                AllowMidrolls = this.allowMidrolls,
+            };
         }
 
         public Chapter ToChapterData() {

@@ -16,6 +16,12 @@ namespace JSONMapper {
         public List<TextMessageNode> TextList = new List<TextMessageNode>();
         public List<ResponseNode> Responses = new List<ResponseNode>();
 
+        private TextField ContactTextField;
+        private TextField TimeIndicatorTextField;
+        private TextField UnlockInstaPostsAccountTextField;
+        private TextField UnlockListTextField;
+
+
         public SubChapNode(GraphView graphView) : base(graphView) {
             title = "SubChapter";
 
@@ -36,21 +42,20 @@ namespace JSONMapper {
 
             var Foldout = new Foldout() { text = "Sub Chapter Content" };
 
-            var ContactTextField = new TextField("Contact") { value = Contact };
+            ContactTextField = new TextField("Contact") { value = Contact };
             ContactTextField.RegisterValueChangedCallback(evt => Contact = evt.newValue);
 
-            var TimeIndicatorTextField = new TextField("Time Indicator") { value = TimeIndicator };
+            TimeIndicatorTextField = new TextField("Time Indicator") { value = TimeIndicator };
             TimeIndicatorTextField.RegisterValueChangedCallback(evt => TimeIndicator = evt.newValue);
 
-            var UnlockInstaPostsAccountTextField = new TextField("Unlock Insta Account") { value = UnlockInstaPostsAccount };
+            UnlockInstaPostsAccountTextField = new TextField("Unlock Insta Account") { value = UnlockInstaPostsAccount };
             UnlockInstaPostsAccountTextField.RegisterValueChangedCallback(evt => UnlockInstaPostsAccount = evt.newValue);
 
-            var UnlockListTextField = new TextField("Unlock Posts List");
+            UnlockListTextField = new TextField("Unlock Posts List");
             UnlockListTextField.RegisterValueChangedCallback(evt => {
                 var UnlockList = (from Match m in Regex.Matches(evt.newValue, @"\d+") select m.Value).ToList();
                 UnlockPosts = UnlockList.ConvertAll(int.Parse);
             });
-
 
             ContactTextField.AddClasses(
                 "jm-node__subchap-textfield",
@@ -80,11 +85,20 @@ namespace JSONMapper {
             RefreshPorts();
         }
 
-        private void GetUnlockPostList(List<string> UnlockList) {
-            UnlockPosts = new List<int>();
-            foreach(string post in UnlockList) {
-                UnlockPosts.Add(Convert.ToInt32(post));
-            }
+        public void UpdateFields() {
+            ContactTextField.value = Contact;
+            TimeIndicatorTextField.value = TimeIndicator;
+            UnlockInstaPostsAccountTextField.value = UnlockInstaPostsAccount;
+            UnlockListTextField.value = string.Join( ",", UnlockPosts.ToArray());
+        }
+
+        public SubChap ToSubChapAsset() {
+            return new SubChap {
+                Contact = this.Contact,
+                TimeIndicator = this.TimeIndicator,
+                UnlockInstaPostsAccount = this.UnlockInstaPostsAccount,
+                UnlockPosts = this.UnlockPosts,
+            };
         }
 
         public SubChap ToSubChapData() {

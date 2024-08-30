@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e1f9cd18c7c62270ba9db60a432a382, type: 3}
+  m_Name: Chapter
+  m_EditorClassIdentifier: 
+  Chapters:
+  - AllowMidrolls: 1
+    SubChaps: []
+  SubChapters:
+  - Contact: Althea
+    TimeIndicator: 2 days later
+    TextList: []
+    UnlockInstaPostsAccount: Althea
+    UnlockPosts: 0100000002000000030000000400000005000000
+    Responses: []
+  TextMessages:
+  - Type: 3
+    TextContent: Testing TextMessage
+    TextDelay: 2.5
+  Responses:
+  - RespTree: 1
+    TextContent: Testing resp
+    SubChapNum: 2
+    Type: 4

@@ -1,14 +1,23 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace JSONMapper {
     public class ResponseNode : BaseNode {
+        List<string> TypeOptions = new List<string>{ "Type of Text", "Sent Text 0", "Sent Image 2", "Sent Emoji 4" };
+
         public bool RespTree = false;
         public string TextContent;
         public int SubChapNum;
         public int Type;
+
+        private TextField TextMessageField;
+        private Toggle ResponseTreeToggle;
+        private IntegerField NextSubChapField;
+        private DropdownField TypeDropDown;
+
         public ResponseNode(GraphView graphView) : base(graphView) {
             title = "Response";
 
@@ -21,17 +30,16 @@ namespace JSONMapper {
 
             var Foldout = new Foldout() { text = "Response Content" };
 
-            var TextMessageField = new TextField("Response Text", 256, false, false, 'a') { value = TextContent };
+            TextMessageField = new TextField("Response Text", 256, false, false, 'a') { value = TextContent };
             TextMessageField.RegisterValueChangedCallback(evt => TextContent = evt.newValue);
             
-            var TypeOptions = new List<string>{ "Type of Text", "Sent Text 0", "Sent Image 2", "Sent Emoji 4" };
-            var TypeDropDown = new DropdownField("Text Type", TypeOptions, 0);
+            TypeDropDown = new DropdownField("Text Type", TypeOptions, 0);
             TypeDropDown.RegisterValueChangedCallback(evt => Type = int.Parse(Regex.Match(evt.newValue, @"\d+").Value));
 
-            var NextSubChapField = new IntegerField("Next Sub Chapter") { value = SubChapNum };
+            NextSubChapField = new IntegerField("Next Sub Chapter") { value = SubChapNum };
             NextSubChapField.RegisterValueChangedCallback(evt => SubChapNum = evt.newValue);
 
-            var ResponseTreeToggle = new Toggle("Response Tree") { value = RespTree };
+            ResponseTreeToggle = new Toggle("Response Tree") { value = RespTree };
             ResponseTreeToggle.RegisterValueChangedCallback(evt => RespTree = evt.newValue);
 
             TextMessageField.AddClasses(
@@ -60,6 +68,13 @@ namespace JSONMapper {
 
             RefreshExpandedState();
             RefreshPorts();
+        }
+
+        public void UpdateFields() {
+            TextMessageField.value = TextContent;
+            ResponseTreeToggle.value = RespTree;
+            NextSubChapField.value = SubChapNum;
+            TypeDropDown.value = TypeOptions[TypeOptions.FindIndex(x => x.Contains("" + Type))];
         }
 
         public Response ToResponseData() {

@@ -45,11 +45,62 @@ namespace JSONMapper {
 
             var saveButton = new Button(() => SaveGraphToJson())
             {
-                text = "Save"
+                text = "Save as JSON"
             };
             toolbar.Add(saveButton);
 
+            var saveAssetButton = new Button(() => SaveGraphToAsset()) {
+                text = "Save to Asset"
+            };
+            toolbar.Add(saveAssetButton);
+
+            var LoadAssetButton = new Button(() => LoadGraphFromAsset()) {
+                text = "Load From Asset"
+            };
+            toolbar.Add(LoadAssetButton); 
+
             rootVisualElement.Add(toolbar);
+        }
+        
+        private void SaveGraphToAsset() {
+            var graphData = new GraphData(); 
+            foreach (var node in graphView.nodes) {
+                if (node is ChapterNode chapterNode) {
+                    graphData.Chapters.Add(chapterNode.ToChapterAsset());
+                } else if (node is SubChapNode subChapNode) {
+                    graphData.SubChapters.Add(subChapNode.ToSubChapAsset());
+                } else if (node is TextMessageNode textMessageNode) {
+                    graphData.TextMessages.Add(textMessageNode.ToTextMessageData());
+                } else if (node is ResponseNode responseNode) {
+                    graphData.Responses.Add(responseNode.ToResponseData());
+                }
+            }
+
+            string path = EditorUtility.SaveFilePanel("Save Graph to Asset", "", "GraphData.asset", "asset");
+            if (!string.IsNullOrEmpty(path)) {
+                var asset = ScriptableObject.CreateInstance<GraphData>();
+                asset.CopyFrom(graphData);
+                AssetDatabase.CreateAsset(asset, FileUtil.GetProjectRelativePath(path));
+                AssetDatabase.SaveAssets();
+                Debug.Log("Graph saved to " + path);
+            }
+        }
+
+        private void LoadGraphFromAsset() {
+            string path = EditorUtility.OpenFilePanel("Load Graph from Asset", "", "asset");
+            if (!string.IsNullOrEmpty(path)) {
+                var asset = AssetDatabase.LoadAssetAtPath<GraphData>(FileUtil.GetProjectRelativePath(path));
+                if (asset != null) {
+                    foreach (var node in graphView.nodes) {
+                        graphView.RemoveElement(node);
+                    }
+                    foreach(var connection in graphView.edges) {
+                        graphView.RemoveElement(connection);
+                    }
+                    asset.PopulateGraphView(graphView);
+                    Debug.Log("Graph loaded from " + path);
+                }
+            }
         }
 
         private void SaveGraphToJson() {

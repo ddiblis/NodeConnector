@@ -27,7 +27,7 @@ namespace JSONMapper {
             );
         }
 
-        // it says 0 references but it is actually handling the connection, do not remove itW
+        // it says 0 references but it is actually handling the connection, do not remove it
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
             List<Port> compatiblePorts = new List<Port>();
             ports.ForEach(port => {
