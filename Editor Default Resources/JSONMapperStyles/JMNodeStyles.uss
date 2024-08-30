@@ -133,3 +133,15 @@ TextField {
 .unity-toggle__text {
     margin-left: var(--jm-metrics-window-pixels-2);
 }
+
+/* INPUT PORT */
+.jm-node__ResponsePort {
+    margin-top: 20px;
+    margin-right: 140px;
+}
+.jm-node__ParentResponsePort {
+    margin-left: 130px;
+}
+.jm-node__NextSubChapterNodePort {
+    margin-right: 130px
+}

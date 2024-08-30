@@ -33,17 +33,21 @@ namespace JSONMapper {
             ParentChapterPort.portName = "Parent Chapter";
             inputContainer.Add(ParentChapterPort);
 
-            ParentResponsePort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(ChapterNode));
-            ParentResponsePort.portName = "Parent Response";
-            inputContainer.Add(ParentResponsePort);
-
             TextMessagesPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
             TextMessagesPort.portName = "Text Messages";
             outputContainer.Add(TextMessagesPort);
 
-            ResponsesPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(ResponseNode));
+            var ParentResponsePortContainer = new VisualElement();
+
+            ParentResponsePort = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Multi, typeof(ChapterNode));
+            ParentResponsePort.portName = "Parent Response";
+            ParentResponsePortContainer.Add(ParentResponsePort);
+
+            var ResponsePortContainer = new VisualElement();
+
+            ResponsesPort = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(ResponseNode));
             ResponsesPort.portName = "Responses";
-            outputContainer.Add(ResponsesPort);
+            ResponsePortContainer.Add(ResponsesPort);
 
             var CustomDataContainer = new VisualElement();
             CustomDataContainer.AddToClassList("jm-node__custom-data-container");
@@ -81,13 +85,25 @@ namespace JSONMapper {
                 "jm-node__subchap-textfield",
                 "jm-node__subchap-quote-textfield"
             );
+            ParentResponsePortContainer.AddClasses(
+                "jm-node__custom-data-container"
+            );
+            ParentResponsePort.AddClasses(
+                "jm-node__ParentResponsePort"
+            );
+            ResponsePortContainer.AddClasses(
+                "jm-node__NextSubChapterNodePort"
+            );
 
+
+            Insert(0, ParentResponsePortContainer);
             Foldout.Add(ContactTextField);
             Foldout.Add(TimeIndicatorTextField);
             Foldout.Add(UnlockInstaPostsAccountTextField);
             Foldout.Add(UnlockListTextField);
             CustomDataContainer.Add(Foldout);
             extensionContainer.Add(CustomDataContainer);
+            CustomDataContainer.Add(ResponsePortContainer);
 
             RefreshExpandedState();
             RefreshPorts();

@@ -23,13 +23,17 @@ namespace JSONMapper {
         public ResponseNode(GraphView graphView) : base(graphView) {
             title = "Response";
 
-            ParentSubChapPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
-            ParentSubChapPort.portName = "Parent SubChap";
-            inputContainer.Add(ParentSubChapPort);
+            var ParentSubChapPortContainer = new VisualElement();
 
-            NextSubChapterNodePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(SubChapNode));
+            ParentSubChapPort = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(SubChapNode));
+            ParentSubChapPort.portName = "Parent SubChap";
+            ParentSubChapPortContainer.Add(ParentSubChapPort);
+
+            var NextSubChapPortContainer = new VisualElement();
+
+            NextSubChapterNodePort = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(SubChapNode));
             NextSubChapterNodePort.portName = "Next SubChap";
-            inputContainer.Add(NextSubChapterNodePort);
+            NextSubChapPortContainer.Add(NextSubChapterNodePort);
 
             var CustomDataContainer = new VisualElement();
             CustomDataContainer.AddToClassList("jm-node__custom-data-container");
@@ -64,13 +68,27 @@ namespace JSONMapper {
                 "jm-node__textfield",
                 "jm-node__quote-textfield"
             );
+            ParentSubChapPortContainer.AddClasses(
+                "jm-node__custom-data-container"
+            );
+            NextSubChapPortContainer.AddClasses(
+                "jm-node__custom-data-container"
+            );
+            ParentSubChapPort.AddClasses(
+                "jm-node__ParentResponsePort"
+            );
+            NextSubChapterNodePort.AddClasses(
+                "jm-node__NextSubChapterNodePort"
+            );
 
+            Insert(0, ParentSubChapPortContainer);
             Foldout.Add(ResponseTreeToggle);
             Foldout.Add(TextMessageField);
             Foldout.Add(TypeDropDown);
             Foldout.Add(NextSubChapField);
             CustomDataContainer.Add(Foldout);
             extensionContainer.Add(CustomDataContainer);
+            CustomDataContainer.Add(NextSubChapPortContainer);
 
             RefreshExpandedState();
             RefreshPorts();

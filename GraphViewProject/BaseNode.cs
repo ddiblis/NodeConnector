@@ -29,6 +29,7 @@ namespace JSONMapper {
                         subChapNode.Responses.Add(responseNode);
                     }
                 }
+
                 else if (this is ChapterNode chapterNode && port.portName == "SubChapters" && edge.input.node is SubChapNode subChap) {
                     chapterNode.SubChaps.Add(subChap);
                 }
