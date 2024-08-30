@@ -14,20 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Chapters:
   - AllowMidrolls: 1
-    SubChaps: []
-  SubChapters:
-  - Contact: Althea
-    TimeIndicator: 2 days later
-    TextList: []
-    UnlockInstaPostsAccount: Althea
-    UnlockPosts: 0100000002000000030000000400000005000000
-    Responses: []
-  TextMessages:
-  - Type: 3
-    TextContent: Testing TextMessage
-    TextDelay: 2.5
-  Responses:
-  - RespTree: 1
-    TextContent: Testing resp
-    SubChapNum: 2
-    Type: 4
+    SubChaps:
+    - Contact: Althea
+      TimeIndicator: 2 Days Later
+      TextList:
+      - Type: 1
+        TextContent: Testing sent text
+        TextDelay: 2.5
+      UnlockInstaPostsAccount: Althea
+      UnlockPosts: 0100000002000000030000000400000005000000
+      Responses:
+      - RespTree: 0
+        TextContent: Testing resp
+        SubChapNum: 5
+        Type: 0

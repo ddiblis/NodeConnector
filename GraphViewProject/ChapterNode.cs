@@ -6,14 +6,15 @@ namespace JSONMapper {
     public class ChapterNode : BaseNode {
         public bool allowMidrolls;
         private Toggle allowMidrollsToggle;
+        public Port SubChaptersPort;
         public List<SubChapNode> SubChaps = new List<SubChapNode>();
 
         public ChapterNode(GraphView graphView) : base(graphView) {
             title = "Chapter";
 
-            var outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(SubChapNode));
-            outputPort.portName = "SubChapters";
-            inputContainer.Add(outputPort);
+            SubChaptersPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(SubChapNode));
+            SubChaptersPort.portName = "SubChapters";
+            inputContainer.Add(SubChaptersPort);
 
             var CustomDataContainer = new VisualElement();
             CustomDataContainer.AddToClassList("jm-node__custom-data-container");

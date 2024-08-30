@@ -71,10 +71,11 @@ namespace JSONMapper {
         }
 
         public void UpdateFields() {
+            int TypeIndex = TypeOptions.FindIndex(x => x.Contains("" + Type));
             TextMessageField.value = TextContent;
             ResponseTreeToggle.value = RespTree;
             NextSubChapField.value = SubChapNum;
-            TypeDropDown.value = TypeOptions[TypeOptions.FindIndex(x => x.Contains("" + Type))];
+            TypeDropDown.value = TypeOptions[TypeIndex >= 0 ? TypeIndex : 0];
         }
 
         public Response ToResponseData() {

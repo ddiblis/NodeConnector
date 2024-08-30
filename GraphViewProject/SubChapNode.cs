@@ -20,14 +20,15 @@ namespace JSONMapper {
         private TextField TimeIndicatorTextField;
         private TextField UnlockInstaPostsAccountTextField;
         private TextField UnlockListTextField;
+        public Port ParentChapterPort;
 
 
         public SubChapNode(GraphView graphView) : base(graphView) {
             title = "SubChapter";
 
-            var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(ChapterNode));
-            inputPort.portName = "Parent Chapter";
-            inputContainer.Add(inputPort);
+            ParentChapterPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(ChapterNode));
+            ParentChapterPort.portName = "Parent Chapter";
+            inputContainer.Add(ParentChapterPort);
 
             var textMessageOutputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
             textMessageOutputPort.portName = "Text Messages";

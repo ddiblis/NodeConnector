@@ -67,9 +67,11 @@ namespace JSONMapper {
         }
 
         public void UpdateFields() {
+            int TypeIndex = TypeOptions.FindIndex(x => x.Contains("" + Type));
+            int DelayIndex = DelayOptions.FindIndex(x => x.Contains("" + TextDelay));
             TextMessageField.value = TextContent;
-            TypeDropDown.value = TypeOptions[TypeOptions.FindIndex(x => x.Contains("" + Type))];
-            DelayDropDown.value = DelayOptions[DelayOptions.FindIndex(x => x.Contains("" + TextDelay))];
+            TypeDropDown.value = TypeOptions[TypeIndex >= 0 ? TypeIndex : 0];
+            DelayDropDown.value = DelayOptions[DelayIndex >= 0 ? DelayIndex : 0];
         }
 
         public TextMessage ToTextMessageData() {
