@@ -97,7 +97,7 @@ namespace JSONMapper {
             ContactTextField.value = Contact;
             TimeIndicatorTextField.value = TimeIndicator;
             UnlockInstaPostsAccountTextField.value = UnlockInstaPostsAccount;
-            UnlockListTextField.value = string.Join( ",", UnlockPosts.ToArray());
+            UnlockListTextField.value = UnlockPosts.Count > 0 ? string.Join( ",", UnlockPosts.ToArray()) : "";
         }
 
         public SubChapData ToSubChapNodeData() {

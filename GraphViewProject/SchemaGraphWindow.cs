@@ -65,7 +65,7 @@ namespace JSONMapper {
         }
         
         private void SaveGraphToAsset() {
-            var graphData = new GraphData(); 
+            var graphData = CreateInstance<GraphData>();
             foreach (var node in graphView.nodes) {
                 if (node is ChapterNode chapterNode) {
                     graphData.Chapters.Add(chapterNode.ToChapterNodeData());
@@ -74,7 +74,7 @@ namespace JSONMapper {
 
             string path = EditorUtility.SaveFilePanel("Save Graph to Asset", "", "GraphData.asset", "asset");
             if (!string.IsNullOrEmpty(path)) {
-                var asset = ScriptableObject.CreateInstance<GraphData>();
+                var asset = CreateInstance<GraphData>();
                 asset.CopyFrom(graphData);
                 AssetDatabase.CreateAsset(asset, FileUtil.GetProjectRelativePath(path));
                 AssetDatabase.SaveAssets();

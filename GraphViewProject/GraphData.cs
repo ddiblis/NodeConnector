@@ -33,6 +33,19 @@ namespace JSONMapper {
             LoadSubChapNodes(Chapter, graphView, ChapterNode);
         }
 
+        private void ConnectSubChapToParentResponses(GraphView graphView, Port InputPort, int index) {
+            List<ResponseNode> ResponseParentNodes = new List<ResponseNode>();
+
+            foreach (var node in graphView.nodes) {
+                    if (node is ResponseNode responseNode && responseNode.SubChapNum == index) {
+                        ResponseParentNodes.Add(responseNode);
+                    }
+                }
+                foreach (var respNode in ResponseParentNodes) {
+                    ConnectNodes(InputPort, respNode.NextSubChapterNodePort, graphView);
+                }
+        }
+
         private void ConnectNodes(Port InputPort, Port OutputPort, GraphView graphView) {
             Edge Connection = new Edge(){
                 input = InputPort,
@@ -43,6 +56,7 @@ namespace JSONMapper {
         }
 
         private void LoadSubChapNodes(ChapterData chapter, GraphView graphView, ChapterNode ChapterNode) {
+            int index = 0;
             foreach(SubChapData subChap in chapter.SubChaps) {
                 var SubChapNode = new SubChapNode(graphView) {
                 Contact = subChap.Contact,
@@ -61,8 +75,10 @@ namespace JSONMapper {
                 // Creates the connections and adds them to the list inside the parent node
                 ConnectNodes(SubChapNode.ParentChapterPort, ChapterNode.SubChaptersPort, graphView);
                 ChapterNode.SubChaps.Add(SubChapNode);
+                ConnectSubChapToParentResponses(graphView, SubChapNode.ParentResponsePort, index);
                 LoadTextMessageNodes(subChap, graphView, SubChapNode);
                 LoadResponseNodes(subChap, graphView, SubChapNode);
+                index += 1;
             }
         }
 
