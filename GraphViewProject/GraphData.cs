@@ -10,7 +10,7 @@ using System.Linq;
 namespace JSONMapper {
     [System.Serializable]
     public class GraphData : ScriptableObject {
-        public List<ChapterData> Chapters = new List<ChapterData>();
+        public List<ChapterData> Chapters = new();
         
 
         public void CopyFrom(GraphData saved) {
@@ -20,7 +20,8 @@ namespace JSONMapper {
         public void PopulateGraphView(GraphView graphView) {
             ChapterData Chapter = Chapters[0];
             var ChapterNode = new ChapterNode(graphView) {
-                allowMidrolls = Chapter.AllowMidrolls
+                allowMidrolls = Chapter.AllowMidrolls,
+                Checkpoint = Chapter.StoryCheckpoint
             };
             ChapterNode.UpdateFields();
             ChapterNode.SetPosition(new Rect{
@@ -33,21 +34,31 @@ namespace JSONMapper {
             LoadSubChapNodes(Chapter, graphView, ChapterNode);
         }
 
-        private void ConnectSubChapToParentResponses(GraphView graphView, Port InputPort, int index) {
-            List<ResponseNode> ResponseParentNodes = new List<ResponseNode>();
+        private void ConnectSubChapToParentResponses(GraphView graphView) {
+            List<ResponseNode> ResponseParentNodes = new();
+            SubChapNode subChap = null;
 
-            foreach (var node in graphView.nodes) {
-                    if (node is ResponseNode responseNode && responseNode.SubChapNum == index) {
-                        ResponseParentNodes.Add(responseNode);
+            foreach(var node in graphView.nodes) {
+                if (node is ResponseNode responseNode) {
+                    foreach(var node1 in graphView.nodes) {
+                        if (node1 is SubChapNode subChapNode && subChapNode.SubChapIndex == responseNode.SubChapNum) {
+                            subChap = subChapNode;
+                            ResponseParentNodes.Add(responseNode);
+                            responseNode.NextSubChap = subChapNode;
+                        }
+                    }
+                    foreach (var respNode in ResponseParentNodes) {
+                        ConnectNodes(subChap.ParentResponsePort, respNode.NextSubChapterNodePort, graphView);
                     }
                 }
-                foreach (var respNode in ResponseParentNodes) {
-                    ConnectNodes(InputPort, respNode.NextSubChapterNodePort, graphView);
-                }
+                ResponseParentNodes = new();
+                subChap = null;
+            }
         }
 
+
         private void ConnectNodes(Port InputPort, Port OutputPort, GraphView graphView) {
-            Edge Connection = new Edge(){
+            Edge Connection = new() {
                 input = InputPort,
                 output = OutputPort
             };
@@ -60,9 +71,9 @@ namespace JSONMapper {
             foreach(SubChapData subChap in chapter.SubChaps) {
                 var SubChapNode = new SubChapNode(graphView) {
                 Contact = subChap.Contact,
-                TimeIndicator = subChap.TimeIndicator,
                 UnlockInstaPostsAccount = subChap.UnlockInstaPostsAccount,
-                UnlockPosts = subChap.UnlockPosts
+                UnlockPosts = subChap.UnlockPosts,
+                SubChapIndex = index
                 };
                 SubChapNode.UpdateFields();
                 SubChapNode.SetPosition(new Rect {
@@ -73,21 +84,27 @@ namespace JSONMapper {
                 });
                 graphView.AddElement(SubChapNode);
                 // Creates the connections and adds them to the list inside the parent node
-                ConnectNodes(SubChapNode.ParentChapterPort, ChapterNode.SubChaptersPort, graphView);
-                ChapterNode.SubChaps.Add(SubChapNode);
-                ConnectSubChapToParentResponses(graphView, SubChapNode.ParentResponsePort, index);
-                LoadTextMessageNodes(subChap, graphView, SubChapNode);
+                if (index == 0) {
+                    ChapterNode.FirstSubChap = SubChapNode;
+                    ConnectNodes(SubChapNode.ParentChapterPort, ChapterNode.SubChaptersPort, graphView);
+                } 
+                LoadTextMessageNodes(subChap.TextList, graphView, SubChapNode);
                 LoadResponseNodes(subChap, graphView, SubChapNode);
                 index += 1;
             }
+            ConnectSubChapToParentResponses(graphView);
         }
 
-        private void LoadTextMessageNodes(SubChapData subChap, GraphView graphView, SubChapNode SubChapNode) {
-            foreach (TextMessageData text in subChap.TextList) {
-                var TextMessageNode = new TextMessageNode(graphView) {
+        private void LoadTextMessageNodes(List<TextMessageData> textList, GraphView graphView, SubChapNode SubChapNode) {
+            TextMessageNode PrevTextNode = null;
+            for (int i = 0; i < textList.Count; i ++) {
+                TextMessageData text = textList[i];
+                var TextMessageNode = new TextMessageNode(graphView, text.Type) {
+                    AltContact = text.AltContact,
                     TextContent = text.TextContent,
                     TextDelay = text.TextDelay,
-                    Type = text.Type
+                    Type = text.Type,
+                    Tendency = text.Tendency
                 };
                 TextMessageNode.UpdateFields();
                 TextMessageNode.SetPosition(new Rect {
@@ -97,14 +114,21 @@ namespace JSONMapper {
                     height = text.location.Height,
                 });
                 graphView.AddElement(TextMessageNode);
-                ConnectNodes(TextMessageNode.ParentSubChapPort, SubChapNode.TextMessagesPort, graphView);
-                SubChapNode.TextList.Add(TextMessageNode);
+                if (i == 0) {
+                    ConnectNodes(TextMessageNode.ParentSubChapPort, SubChapNode.FirstTextPort, graphView);
+                    SubChapNode.FirstText = TextMessageNode;
+                    PrevTextNode = TextMessageNode;
+                } else {
+                    ConnectNodes(TextMessageNode.PrevText, PrevTextNode.NextText, graphView);
+                    PrevTextNode.NextTextNode = TextMessageNode;
+                    PrevTextNode = TextMessageNode;
+                }
             }
         }
 
         private void LoadResponseNodes(SubChapData subChap, GraphView graphView, SubChapNode SubChapNode) {
             foreach (ResponseData resp in subChap.Responses) {
-                var ResponseNode = new ResponseNode(graphView) {
+                var ResponseNode = new ResponseNode(graphView, resp.Type) {
                     RespTree = resp.RespTree,
                     TextContent = resp.TextContent,
                     SubChapNum = resp.SubChapNum,
@@ -120,6 +144,7 @@ namespace JSONMapper {
                 graphView.AddElement(ResponseNode);
                 ConnectNodes(ResponseNode.ParentSubChapPort, SubChapNode.ResponsesPort, graphView);
                 SubChapNode.Responses.Add(ResponseNode);
+
             }
         }
 

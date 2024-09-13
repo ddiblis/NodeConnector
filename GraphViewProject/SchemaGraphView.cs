@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 
-
 namespace JSONMapper {
     public class SchemaGraphView : GraphView {
         public SchemaGraphView() {
@@ -29,7 +28,7 @@ namespace JSONMapper {
 
         // it says 0 references but it is actually handling the connection, do not remove it
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
-            List<Port> compatiblePorts = new List<Port>();
+            List<Port> compatiblePorts = new();
             ports.ForEach(port => {
                 if (startPort == port) return;
                 if (startPort.node == port.node) return;
@@ -41,71 +40,58 @@ namespace JSONMapper {
 
         private bool IsCompatible(Port startPort, Port targetPort) {
             var startNode = startPort.node as BaseNode;
-            var targetNode = targetPort.node as BaseNode;
-
-            // Ensure connections are between specific types
-            if (
-                startNode is ChapterNode
-                && targetNode is SubChapNode
-                && startPort.direction == Direction.Output
-                && targetPort.direction == Direction.Input
-            ) return true;
-
-            if (
-                startNode is SubChapNode
-                && targetNode is ChapterNode
-                && startPort.direction == Direction.Input
-                && targetPort.direction == Direction.Output
-            ) return true;
-
-            if (
-                startNode is SubChapNode
-                && startPort.portName == "Text Messages"
-                && targetNode is TextMessageNode
-                && startPort.direction == Direction.Output
-                && targetPort.direction == Direction.Input
-            ) return true;
-
-            if (
-                startNode is SubChapNode
-                && startPort.portName == "Responses"
-                && targetNode is ResponseNode
-                && startPort.direction == Direction.Output
-                && targetPort.direction == Direction.Input
-            ) return true;
-
-            if (
-                startNode is TextMessageNode
-                && targetNode is SubChapNode
-                && startPort.direction == Direction.Input
-                && targetPort.direction == Direction.Output
-                && targetPort.portName == "Text Messages"
-            ) return true;
-
-            if (
-                startNode is ResponseNode
-                && targetNode is SubChapNode
-                && startPort.direction == Direction.Input
-                && targetPort.direction == Direction.Output
-                && targetPort.portName == "Responses"
-            ) return true;
-
-            if (
-                startNode is ResponseNode
-                && targetNode is SubChapNode
-                && startPort.direction == Direction.Output
-                && targetPort.direction == Direction.Input
-                && targetPort.portName == "Parent Response"
-            ) return true;
-
-            if (
-                startNode is SubChapNode
-                && targetNode is ResponseNode
-                && startPort.direction == Direction.Input
-                && targetPort.direction == Direction.Output
-                && targetPort.portName == "Next SubChap"
-            ) return true;
-
+            
+            // Ensure connections are between specific Ports only
+            switch (startNode) {
+                case ChapterNode:
+                    if (
+                        startPort.portName == "First SubChapter"
+                        && targetPort.portName == "Parent Chapter"
+                    ) return true;
+                break;
+                case SubChapNode:
+                    if (
+                        startPort.portName == "Parent Chapter"
+                        && targetPort.portName == "First SubChapter"
+                    ) return true;
+                    if (
+                        startPort.portName == "Start of Texts"
+                        && targetPort.portName == "Parent SubChap"
+                    ) return true;
+                    if (
+                        startPort.portName == "Responses"
+                        && targetPort.portName == "Parent SubChap"
+                    ) return true;
+                    if (
+                        startPort.portName == "Parent Response"
+                        && targetPort.portName == "Next SubChap"
+                    ) return true;
+                break;
+                case TextMessageNode:
+                    if (
+                        startPort.portName == "Parent SubChap"
+                        && targetPort.portName == "Start of Texts"
+                    ) return true;
+                    if (
+                        startPort.portName == "Next Text"
+                        && targetPort.portName == "Previous Text"
+                    ) return true;
+                    if (
+                        startPort.portName == "Previous Text"
+                        && targetPort.portName == "Next Text"
+                    ) return true;
+                break;
+                case ResponseNode:
+                    if (
+                        targetPort.portName == "Responses"
+                        && startPort.portName == "Parent SubChap"
+                    ) return true;
+                    if (
+                        targetPort.portName == "Parent Response"
+                        && startPort.portName == "Next SubChap"
+                    ) return true;
+                break;
+            }
             return false;
         }
 
@@ -119,8 +105,8 @@ namespace JSONMapper {
             this.AddManipulator(new ContextualMenuManipulator(evt => {
                 evt.menu.AppendAction("Add Chapter Node", action => AddNode(new ChapterNode(this), GetLocalMousePosition(action.eventInfo.localMousePosition)));
                 evt.menu.AppendAction("Add SubChap Node", action => AddNode(new SubChapNode(this), GetLocalMousePosition(action.eventInfo.localMousePosition)));
-                evt.menu.AppendAction("Add TextMessage Node", action => AddNode(new TextMessageNode(this), GetLocalMousePosition(action.eventInfo.localMousePosition)));
-                evt.menu.AppendAction("Add Response Node", action => AddNode(new ResponseNode(this), GetLocalMousePosition(action.eventInfo.localMousePosition)));
+                evt.menu.AppendAction("Add TextMessage Node", action => AddNode(new TextMessageNode(this, 0), GetLocalMousePosition(action.eventInfo.localMousePosition)));
+                evt.menu.AppendAction("Add Response Node", action => AddNode(new ResponseNode(this, 0), GetLocalMousePosition(action.eventInfo.localMousePosition)));
             }));
         }
 

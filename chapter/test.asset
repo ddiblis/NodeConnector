@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e1f9cd18c7c62270ba9db60a432a382, type: 3}
+  m_Name: test
+  m_EditorClassIdentifier: 
+  Chapters:
+  - AllowMidrolls: 0
+    location:
+      x: -295
+      y: -321
+      Width: 192
+      Height: 135
+    SubChaps:
+    - Contact: 
+      TimeIndicator: 
+      TextList:
+      - Type: 5
+        TextContent: 
+        TextDelay: 2.5
+        location:
+          x: 741
+          y: -678
+          Width: 323
+          Height: 214
+      - Type: 5
+        TextContent: 
+        TextDelay: 0.5
+        location:
+          x: 1108
+          y: -677
+          Width: 323
+          Height: 214
+      UnlockInstaPostsAccount: 
+      UnlockPosts: 
+      Responses:
+      - RespTree: 0
+        TextContent: 
+        SubChapNum: 2
+        Type: 0
+        location:
+          x: 42
+          y: -364
+          Width: 323
+          Height: 278
+      - RespTree: 0
+        TextContent: 
+        SubChapNum: 1
+        Type: 0
+        location:
+          x: 558
+          y: -345
+          Width: 323
+          Height: 278
+      location:
+        x: 305
+        y: -696
+        Width: 323
+        Height: 329
+    - Contact: 
+      TimeIndicator: 
+      TextList: []
+      UnlockInstaPostsAccount: 
+      UnlockPosts: 
+      Responses: []
+      location:
+        x: 573
+        y: -35
+        Width: 323
+        Height: 329
+    - Contact: 
+      TimeIndicator: 
+      TextList: []
+      UnlockInstaPostsAccount: 
+      UnlockPosts: 
+      Responses: []
+      location:
+        x: 44
+        y: -57
+        Width: 323
+        Height: 329

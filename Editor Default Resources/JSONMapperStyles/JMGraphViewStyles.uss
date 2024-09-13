@@ -4,8 +4,3 @@ GridBackground {
     --thick-line-color: Var(--jm-colors-grid-light-grey-3);
     --spacing: Var(--jm-metrics-grid-50);
 }
-
-.jm-edge__edgecolor {
-    color: rgba(245, 40, 145, 0.8);
-    edge-color: rgba(245, 40, 145, 0.8);
-}

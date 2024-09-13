@@ -6,22 +6,23 @@ using UnityEngine;
 using System.Linq;
 using System.Text;
 using System;
+using UnityEngine.UI;
 
 namespace JSONMapper {
     public class SubChapNode : BaseNode {  
+        public int SubChapIndex;
         public string Contact;
-        public string TimeIndicator;
         public string UnlockInstaPostsAccount;
         public List<int> UnlockPosts;
-        public List<TextMessageNode> TextList = new List<TextMessageNode>();
-        public List<ResponseNode> Responses = new List<ResponseNode>();
+        public TextMessageNode FirstText;
+        public List<ResponseNode> Responses = new();
 
-        private TextField ContactTextField;
-        private TextField TimeIndicatorTextField;
-        private TextField UnlockInstaPostsAccountTextField;
-        private TextField UnlockListTextField;
+
+        private readonly TextField ContactTextField;
+        private readonly TextField UnlockInstaPostsAccountTextField;
+        private readonly TextField UnlockListTextField;
         public Port ParentChapterPort;
-        public Port TextMessagesPort;
+        public Port FirstTextPort;
         public Port ResponsesPort;
         public Port ParentResponsePort;
 
@@ -33,9 +34,9 @@ namespace JSONMapper {
             ParentChapterPort.portName = "Parent Chapter";
             inputContainer.Add(ParentChapterPort);
 
-            TextMessagesPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
-            TextMessagesPort.portName = "Text Messages";
-            outputContainer.Add(TextMessagesPort);
+            FirstTextPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(TextMessageNode));
+            FirstTextPort.portName = "Start of Texts";
+            outputContainer.Add(FirstTextPort);
 
             var ParentResponsePortContainer = new VisualElement();
 
@@ -57,9 +58,6 @@ namespace JSONMapper {
             ContactTextField = new TextField("Contact") { value = Contact };
             ContactTextField.RegisterValueChangedCallback(evt => Contact = evt.newValue);
 
-            TimeIndicatorTextField = new TextField("Time Indicator") { value = TimeIndicator };
-            TimeIndicatorTextField.RegisterValueChangedCallback(evt => TimeIndicator = evt.newValue);
-
             UnlockInstaPostsAccountTextField = new TextField("Unlock Insta Account") { value = UnlockInstaPostsAccount };
             UnlockInstaPostsAccountTextField.RegisterValueChangedCallback(evt => UnlockInstaPostsAccount = evt.newValue);
 
@@ -70,10 +68,6 @@ namespace JSONMapper {
             });
 
             ContactTextField.AddClasses(
-                "jm-node__subchap-textfield",
-                "jm-node__subchap-quote-textfield"
-            );
-            TimeIndicatorTextField.AddClasses(
                 "jm-node__subchap-textfield",
                 "jm-node__subchap-quote-textfield"
             );
@@ -98,7 +92,6 @@ namespace JSONMapper {
 
             Insert(0, ParentResponsePortContainer);
             Foldout.Add(ContactTextField);
-            Foldout.Add(TimeIndicatorTextField);
             Foldout.Add(UnlockInstaPostsAccountTextField);
             Foldout.Add(UnlockListTextField);
             CustomDataContainer.Add(Foldout);
@@ -111,20 +104,36 @@ namespace JSONMapper {
 
         public void UpdateFields() {
             ContactTextField.value = Contact;
-            TimeIndicatorTextField.value = TimeIndicator;
             UnlockInstaPostsAccountTextField.value = UnlockInstaPostsAccount;
-            UnlockListTextField.value = UnlockPosts.Count > 0 ? string.Join( ",", UnlockPosts.ToArray()) : "";
+            if (UnlockPosts != null && UnlockPosts.Count > 0) {
+                UnlockListTextField.value = string.Join( ",", UnlockPosts.ToArray());
+            } else {  
+                UnlockListTextField.value = "";
+            }
         }
 
         public SubChapData ToSubChapNodeData() {
-            Rect rect = this.GetPosition();
+            Rect rect = GetPosition();
+            List<TextMessageNode> TextList = new();
+            if (FirstText != null) {
+                TextList.Add(FirstText);
+                TextMessageNode CurrNode = FirstText;
+                bool nextTextAvaliable = true;
+                while (nextTextAvaliable) {
+                    if (CurrNode.NextTextNode != null) {
+                        CurrNode = CurrNode.NextTextNode;
+                        TextList.Add(CurrNode);
+                    } else {
+                        nextTextAvaliable = false;
+                    }
+                }
+            }
             return new SubChapData {
-                Contact = this.Contact,
-                TimeIndicator = this.TimeIndicator,
-                UnlockInstaPostsAccount = this.UnlockInstaPostsAccount,
-                UnlockPosts = this.UnlockPosts,
-                TextList = this.TextList.ConvertAll(textNode => textNode.ToTextMessageNodeData()),
-                Responses = this.Responses.ConvertAll(responseNode => responseNode.ToResponseNodeData()),
+                Contact = Contact,
+                UnlockInstaPostsAccount = UnlockInstaPostsAccount,
+                UnlockPosts = UnlockPosts,
+                TextList = TextList.ConvertAll(textNode => textNode.ToTextMessageNodeData()),
+                Responses = Responses.ConvertAll(responseNode => responseNode.ToResponseNodeData()),
                 location = new Location {
                     x = rect.x,
                     y = rect.y,
@@ -135,13 +144,26 @@ namespace JSONMapper {
         }
 
         public SubChap ToSubChapData() {
+            List<TextMessageNode> TextList = new();
+            if (FirstText != null) {
+                TextList.Add(FirstText);
+                TextMessageNode CurrNode = FirstText;
+                bool nextTextAvaliable = true;
+                while (nextTextAvaliable) {
+                    if (CurrNode.NextTextNode != null) {
+                        CurrNode = CurrNode.NextTextNode;
+                        TextList.Add(CurrNode);
+                    } else {
+                        nextTextAvaliable = false;
+                    }
+                }
+            }
             return new SubChap {
-                Contact = this.Contact,
-                TimeIndicator = this.TimeIndicator,
-                UnlockInstaPostsAccount = this.UnlockInstaPostsAccount,
-                UnlockPosts = this.UnlockPosts,
-                TextList = this.TextList.ConvertAll(textNode => textNode.ToTextMessageData()),
-                Responses = this.Responses.ConvertAll(responseNode => responseNode.ToResponseData())
+                Contact = Contact,
+                UnlockInstaPostsAccount = UnlockInstaPostsAccount,
+                UnlockPosts = UnlockPosts,
+                TextList = TextList.ConvertAll(textNode => textNode.ToTextMessageData()),
+                Responses = Responses.ConvertAll(responseNode => responseNode.ToResponseData())
             };
         }
 
