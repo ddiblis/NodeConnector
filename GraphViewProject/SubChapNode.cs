@@ -7,20 +7,20 @@ using System.Linq;
 using System.Text;
 using System;
 using UnityEngine.UI;
+using System.IO;
 
 namespace JSONMapper {
     public class SubChapNode : BaseNode {  
         public int SubChapIndex;
         public string Contact;
-        public string UnlockInstaPostsAccount;
+        public string UnlockIPAccount;
         public List<int> UnlockPosts;
         public TextMessageNode FirstText;
         public List<ResponseNode> Responses = new();
 
-
-        private readonly TextField ContactTextField;
-        private readonly TextField UnlockInstaPostsAccountTextField;
         private readonly TextField UnlockListTextField;
+        private readonly DropdownField ContactDropDown;
+        private readonly DropdownField UnlockIPAccountDropDown;
         public Port ParentChapterPort;
         public Port FirstTextPort;
         public Port ResponsesPort;
@@ -28,6 +28,9 @@ namespace JSONMapper {
 
 
         public SubChapNode(GraphView graphView) : base(graphView) {
+        
+            CustomLists Lists = new();
+
             title = "SubChapter";
 
             ParentChapterPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single, typeof(ChapterNode));
@@ -55,26 +58,22 @@ namespace JSONMapper {
 
             var Foldout = new Foldout() { text = "Sub Chapter Content" };
 
-            ContactTextField = new TextField("Contact") { value = Contact };
-            ContactTextField.RegisterValueChangedCallback(evt => Contact = evt.newValue);
-
-            UnlockInstaPostsAccountTextField = new TextField("Unlock Insta Account") { value = UnlockInstaPostsAccount };
-            UnlockInstaPostsAccountTextField.RegisterValueChangedCallback(evt => UnlockInstaPostsAccount = evt.newValue);
-
             UnlockListTextField = new TextField("Unlock Posts List");
             UnlockListTextField.RegisterValueChangedCallback(evt => {
                 var UnlockList = (from Match m in Regex.Matches(evt.newValue, @"\d+") select m.Value).ToList();
                 UnlockPosts = UnlockList.ConvertAll(int.Parse);
             });
 
-            ContactTextField.AddClasses(
-                "jm-node__subchap-textfield",
-                "jm-node__subchap-quote-textfield"
-            );
-            UnlockInstaPostsAccountTextField.AddClasses(
-                "jm-node__subchap-textfield",
-                "jm-node__subchap-quote-textfield"
-            );
+            ContactDropDown = new DropdownField("Contacts", Lists.Contacts, 0);
+            ContactDropDown.RegisterValueChangedCallback(evt => {
+                Contact = Lists.Contacts[Lists.Contacts.FindIndex(x => x == evt.newValue)];
+            });
+
+            UnlockIPAccountDropDown = new DropdownField("InstaPosts Account", Lists.Contacts, 0);
+            UnlockIPAccountDropDown.RegisterValueChangedCallback(evt => {
+                UnlockIPAccount = Lists.Contacts[Lists.Contacts.FindIndex(x => x == evt.newValue)];
+            });
+
             UnlockListTextField.AddClasses(
                 "jm-node__subchap-textfield",
                 "jm-node__subchap-quote-textfield"
@@ -91,8 +90,8 @@ namespace JSONMapper {
 
 
             Insert(0, ParentResponsePortContainer);
-            Foldout.Add(ContactTextField);
-            Foldout.Add(UnlockInstaPostsAccountTextField);
+            Foldout.Add(ContactDropDown);
+            Foldout.Add(UnlockIPAccountDropDown);
             Foldout.Add(UnlockListTextField);
             CustomDataContainer.Add(Foldout);
             extensionContainer.Add(CustomDataContainer);
@@ -103,8 +102,12 @@ namespace JSONMapper {
         }
 
         public void UpdateFields() {
-            ContactTextField.value = Contact;
-            UnlockInstaPostsAccountTextField.value = UnlockInstaPostsAccount;
+            CustomLists Lists = new();
+            int ContactIndex = Lists.Contacts.FindIndex(x => x == Contact);
+            ContactDropDown.value = Lists.Contacts[ContactIndex > 0 ? ContactIndex : 0];
+
+            int IPAccountIndex = Lists.Contacts.FindIndex(x => x == UnlockIPAccount);
+            UnlockIPAccountDropDown.value = Lists.Contacts[IPAccountIndex > 0 ? IPAccountIndex : 0];
             if (UnlockPosts != null && UnlockPosts.Count > 0) {
                 UnlockListTextField.value = string.Join( ",", UnlockPosts.ToArray());
             } else {  
@@ -128,9 +131,12 @@ namespace JSONMapper {
                     }
                 }
             }
+            CustomLists Lists = new();
+            int IndexOfContact = Lists.Contacts.FindIndex(x => x == Contact);
+            int IPAccountIndex = Lists.Contacts.FindIndex(x => x == UnlockIPAccount);
             return new SubChapData {
-                Contact = Contact,
-                UnlockInstaPostsAccount = UnlockInstaPostsAccount,
+                Contact = IndexOfContact > 0 ? Contact : "",
+                UnlockInstaPostsAccount = IPAccountIndex > 0 ? UnlockIPAccount : "",
                 UnlockPosts = UnlockPosts,
                 TextList = TextList.ConvertAll(textNode => textNode.ToTextMessageNodeData()),
                 Responses = Responses.ConvertAll(responseNode => responseNode.ToResponseNodeData()),
@@ -143,7 +149,7 @@ namespace JSONMapper {
             };
         }
 
-        public SubChap ToSubChapData() {
+        public SubChap ToSubChapData(DBRoot DB, bool isChapter, int chapNum) {
             List<TextMessageNode> TextList = new();
             if (FirstText != null) {
                 TextList.Add(FirstText);
@@ -153,14 +159,19 @@ namespace JSONMapper {
                     if (CurrNode.NextTextNode != null) {
                         CurrNode = CurrNode.NextTextNode;
                         TextList.Add(CurrNode);
+                        if (isChapter && CurrNode.Type == (int)TypeOfText.recImage) {
+                            if (!DB.ChapterImages[chapNum].ImagesList.Contains(CurrNode.TextContent)) {
+                                DB.ChapterImages[chapNum].ImagesList.Add(CurrNode.TextContent);
+                            }
+                        }
                     } else {
                         nextTextAvaliable = false;
                     }
                 }
             }
             return new SubChap {
-                Contact = Contact,
-                UnlockInstaPostsAccount = UnlockInstaPostsAccount,
+                Contact = Contact != "Contacts" ? Contact : "",
+                UnlockInstaPostsAccount = UnlockIPAccount != "Contacts" ? UnlockIPAccount : "",
                 UnlockPosts = UnlockPosts,
                 TextList = TextList.ConvertAll(textNode => textNode.ToTextMessageData()),
                 Responses = Responses.ConvertAll(responseNode => responseNode.ToResponseData())
