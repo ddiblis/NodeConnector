@@ -110,7 +110,6 @@ public class ResponseData
 public class Contact
 {
     public string NameOfContact;
-    // public bool Unlocked;
     public bool NewTexts;
 }
 
@@ -221,7 +220,6 @@ public class PhotoCategory {
 /* ====================== DB ============================ */
 [System.Serializable]
 public class DBRoot {
-    // public List<string> ContactList;
     public List<string> ChapterList;
     public List<string> PhotoList;
     public List<DBMidRoll> MidrollsList;
